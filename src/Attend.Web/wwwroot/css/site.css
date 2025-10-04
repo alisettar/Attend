@@ -1,0 +1,191 @@
+/* Dark Theme Variables */
+:root {
+    --primary-color: #4a9eff;
+    --secondary-color: #6c757d;
+    --success-color: #20c997;
+    --danger-color: #f25767;
+    --warning-color: #ffc107;
+    --dark-bg: #0d1117;
+    --dark-card: #161b22;
+    --dark-border: #30363d;
+    --dark-hover: #21262d;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--dark-bg) !important;
+    color: #c9d1d9 !important;
+}
+
+.card {
+    background-color: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    border-color: var(--primary-color) !important;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%) !important;
+    color: white !important;
+    border-radius: 12px 12px 0 0 !important;
+    font-weight: 600;
+    border: none !important;
+}
+
+.card-body {
+    background-color: var(--dark-card) !important;
+}
+
+.btn {
+    border-radius: 8px;
+    padding: 0.5rem 1.2rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+    border: none;
+}
+
+.btn-outline-primary {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.event-card {
+    border-left: 4px solid var(--primary-color) !important;
+}
+
+.event-date {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-date .day {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.event-date .month {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.stat-card {
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+}
+
+.stat-card .stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    background-color: var(--dark-card) !important;
+    border: 1px solid var(--dark-border);
+    color: #c9d1d9 !important;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(74, 158, 255, 0.25);
+    background-color: var(--dark-hover) !important;
+}
+
+.table {
+    color: #c9d1d9 !important;
+}
+
+.table thead {
+    background-color: var(--dark-hover) !important;
+}
+
+.table tbody tr {
+    background-color: var(--dark-card) !important;
+    border-color: var(--dark-border) !important;
+}
+
+#qr-reader {
+    border-radius: 12px;
+    background-color: var(--dark-card) !important;
+}
+
+.qr-result {
+    background: linear-gradient(135deg, var(--success-color) 0%, #17a085 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    animation: slideDown 0.3s;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-success {
+    background-color: rgba(32, 201, 151, 0.15) !important;
+    border-left: 4px solid var(--success-color) !important;
+    color: var(--success-color) !important;
+}
+
+.alert-danger {
+    background-color: rgba(242, 87, 103, 0.15) !important;
+    border-left: 4px solid var(--danger-color) !important;
+    color: var(--danger-color) !important;
+}
+
+.pagination .page-link {
+    background-color: var(--dark-card) !important;
+    border-color: var(--dark-border) !important;
+    color: #c9d1d9 !important;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color) !important;
+}
+
+/* Dropdown */
+.dropdown-menu {
+    background-color: var(--dark-card) !important;
+    border: 1px solid var(--dark-border) !important;
+}
+
+.dropdown-item {
+    color: #c9d1d9 !important;
+}
+
+.dropdown-item:hover {
+    background-color: var(--dark-hover) !important;
+}
+
+.dropdown-item button {
+    color: #c9d1d9 !important;
+    background: none !important;
+    border: none !important;
+    width: 100%;
+    text-align: left;
+}
+
+.dropdown-item button:hover {
+    color: var(--primary-color) !important;
+}

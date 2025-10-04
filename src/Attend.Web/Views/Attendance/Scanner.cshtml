@@ -1,0 +1,166 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
+
+@{
+    ViewData["Title"] = Localizer["QRScanner"];
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="bi bi-qr-code-scan"></i> @Localizer["EventCheckInScanner"]</h4>
+            </div>
+            <div class="card-body p-4">
+                <div id="qr-reader" class="mb-4"></div>
+                
+                <div id="scan-status" class="text-center mb-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">@Localizer["InitializingCamera"]</p>
+                </div>
+
+                <div id="result-container" class="d-none">
+                    <div class="qr-result text-center">
+                        <i class="bi bi-check-circle-fill fs-1 mb-3 d-block"></i>
+                        <h4 id="result-title">@Localizer["CheckInSuccessful"]</h4>
+                        <p id="result-message" class="mb-0"></p>
+                    </div>
+                </div>
+
+                <div id="error-container" class="d-none">
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span id="error-message">@Localizer["ErrorOccurred"]</span>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button id="start-scan-btn" class="btn btn-primary btn-lg d-none">
+                        <i class="bi bi-camera"></i> @Localizer["StartScanning"]
+                    </button>
+                    <button id="stop-scan-btn" class="btn btn-danger btn-lg d-none">
+                        <i class="bi bi-x-circle"></i> @Localizer["StopScanner"]
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mt-4">
+            <div class="card-body">
+                <h5><i class="bi bi-info-circle"></i> @Localizer["HowToUse"]</h5>
+                <ul class="mb-0">
+                    <li>@Localizer["AllowCameraAccess"]</li>
+                    <li>@Localizer["PointCameraAtQR"]</li>
+                    <li>@Localizer["AutomaticProcessing"]</li>
+                    <li>@Localizer["WaitForSuccess"]</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        let html5QrCode;
+        let isScanning = false;
+
+        const messages = {
+            processing: '@Localizer["Processing"]',
+            scannerActive: '@Localizer["ScannerActive"]',
+            scannerStopped: '@Localizer["ScannerStopped"]',
+            errorOccurred: '@Localizer["ErrorOccurred"]',
+            invalidQRCode: '@Localizer["InvalidQRCode"]',
+            checkInFailed: '@Localizer["CheckInFailed"]',
+            networkError: '@Localizer["NetworkError"]',
+            event: '@Localizer["Event"]'
+        };
+
+        function onScanSuccess(decodedText, decodedResult) {
+            if (isScanning) {
+                isScanning = false;
+                html5QrCode.stop();
+                
+                document.getElementById('scan-status').classList.remove('d-none');
+                document.getElementById('scan-status').innerHTML = `<div class="spinner-border text-primary"></div><p class="mt-2">${messages.processing}</p>`;
+
+                fetch('/Attendance/ProcessQRCode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ qrCode: decodedText })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('scan-status').classList.add('d-none');
+                    
+                    if (data.success) {
+                        document.getElementById('result-container').classList.remove('d-none');
+                        document.getElementById('error-container').classList.add('d-none');
+                        document.getElementById('result-message').textContent = 
+                            `${messages.event}: ${data.eventTitle} | ${new Date(data.eventDate).toLocaleDateString()}`;
+                        
+                        setTimeout(() => {
+                            document.getElementById('result-container').classList.add('d-none');
+                            startScanning();
+                        }, 3000);
+                    } else {
+                        document.getElementById('error-container').classList.remove('d-none');
+                        document.getElementById('error-message').textContent = data.message;
+                        
+                        setTimeout(() => {
+                            document.getElementById('error-container').classList.add('d-none');
+                            startScanning();
+                        }, 3000);
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('scan-status').classList.add('d-none');
+                    document.getElementById('error-container').classList.remove('d-none');
+                    document.getElementById('error-message').textContent = messages.networkError;
+                    
+                    setTimeout(() => {
+                        document.getElementById('error-container').classList.add('d-none');
+                        startScanning();
+                    }, 3000);
+                });
+            }
+        }
+
+        function startScanning() {
+            isScanning = true;
+            html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 250, height: 250 } },
+                onScanSuccess
+            ).then(() => {
+                document.getElementById('scan-status').innerHTML = 
+                    `<p class="text-success"><i class="bi bi-camera"></i> ${messages.scannerActive}</p>`;
+                document.getElementById('stop-scan-btn').classList.remove('d-none');
+                document.getElementById('start-scan-btn').classList.add('d-none');
+            }).catch(err => {
+                document.getElementById('scan-status').innerHTML = 
+                    `<p class="text-danger">${messages.errorOccurred}: ${err}</p>`;
+                document.getElementById('start-scan-btn').classList.remove('d-none');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            html5QrCode = new Html5Qrcode("qr-reader");
+            startScanning();
+
+            document.getElementById('start-scan-btn').addEventListener('click', startScanning);
+            
+            document.getElementById('stop-scan-btn').addEventListener('click', function() {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    document.getElementById('scan-status').innerHTML = 
+                        `<p class="text-muted">${messages.scannerStopped}</p>`;
+                    document.getElementById('start-scan-btn').classList.remove('d-none');
+                    document.getElementById('stop-scan-btn').classList.add('d-none');
+                });
+            });
+        });
+    </script>
+}
