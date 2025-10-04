@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/Attend.Api/Attend.Api.csproj" Id="903221d4-11a5-4173-9bf2-4ce257c86dad" />
+  <Project Path="src/Attend.Application/Attend.Application.csproj" Id="29589f3d-48ad-4b87-a7d9-a7c2e6c17a1e" />
+  <Project Path="src/Attend.Domain/Attend.Domain.csproj" Id="7b19b1aa-391c-44dd-9428-4322c7fac9be" />
+  <Project Path="src/Attend.Infrastrcuture/Attend.Infrastrcuture.csproj" Id="37bae1f6-394e-4b90-8b8f-741fa4d2d7a4" />
+</Solution>
