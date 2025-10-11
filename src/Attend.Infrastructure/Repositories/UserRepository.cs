@@ -42,11 +42,11 @@ public class UserRepository(AttendDbContext context) : IUserRepository
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            var searchLower = request.SearchText.ToLower();
+            var searchUpper = request.SearchText.ToUpperInvariant();
             query = query.Where(u => 
-                u.Name.ToLower().Contains(searchLower) ||
-                (u.Email != null && u.Email.ToLower().Contains(searchLower)) ||
-                (u.Phone != null && u.Phone.ToLower().Contains(searchLower)));
+                u.Name.ToUpperInvariant().Contains(searchUpper) ||
+                (u.Email != null && u.Email.ToUpperInvariant().Contains(searchUpper)) ||
+                (u.Phone != null && u.Phone.ToUpperInvariant().Contains(searchUpper)));
         }
 
         var totalCount = await query.LongCountAsync(cancellationToken);

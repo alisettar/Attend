@@ -1,26 +1,28 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 @model EventCreateViewModel
 
 @{
-    ViewData["Title"] = "Create Event";
+    ViewData["Title"] = Localizer["CreateEvent"];
 }
 
-<h2>Create New Event</h2>
+<h2>@Localizer["CreateEvent"]</h2>
 
 <form asp-action="Create" method="post" class="mt-4">
     <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
+        <label asp-for="Title" class="form-label">@Localizer["Title"]</label>
+        <input asp-for="Title" class="form-control" placeholder="@Localizer["EnterTitle"]" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     
     <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <label asp-for="Description" class="form-label">@Localizer["Description"]</label>
+        <textarea asp-for="Description" class="form-control" rows="4" placeholder="@Localizer["EnterDescription"]"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     
     <div class="mb-3">
-        <label asp-for="Date" class="form-label"></label>
+        <label asp-for="Date" class="form-label">@Localizer["Date"]</label>
         <input asp-for="Date" type="datetime-local" class="form-control" />
         <span asp-validation-for="Date" class="text-danger"></span>
     </div>
@@ -31,7 +33,7 @@
     }
     
     <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Create</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">@Localizer["Save"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
     </div>
 </form>

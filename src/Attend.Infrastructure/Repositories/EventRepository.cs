@@ -32,10 +32,10 @@ public class EventRepository(AttendDbContext context) : IEventRepository
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            var searchLower = request.SearchText.ToLower();
+            var searchUpper = request.SearchText.ToUpperInvariant();
             query = query.Where(e => 
-                e.Title.ToLower().Contains(searchLower) ||
-                (e.Description != null && e.Description.ToLower().Contains(searchLower)));
+                e.Title.ToUpperInvariant().Contains(searchUpper) ||
+                (e.Description != null && e.Description.ToUpperInvariant().Contains(searchUpper)));
         }
 
         var totalCount = await query.LongCountAsync(cancellationToken);

@@ -62,5 +62,11 @@
   "NoEventsFound": "Etkinlik bulunamadı",
   "ConfirmDelete": "Silmek istediğinize emin misiniz?",
   "Details": "Detaylar",
-  "QRCode": "QR Kod"
+  "QRCode": "QR Kod",
+  "Logout": "Çıkış Yap",
+  "EnterName": "Ad soyad giriniz",
+  "EnterEmail": "E-posta giriniz",
+  "EnterPhone": "Telefon giriniz",
+  "EnterTitle": "Başlık giriniz",
+  "EnterDescription": "Açıklama giriniz"
 }

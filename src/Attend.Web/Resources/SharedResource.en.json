@@ -62,5 +62,11 @@
   "NoEventsFound": "No events found",
   "ConfirmDelete": "Are you sure you want to delete?",
   "Details": "Details",
-  "QRCode": "QR Code"
+  "QRCode": "QR Code",
+  "Logout": "Logout",
+  "EnterName": "Enter name",
+  "EnterEmail": "Enter email",
+  "EnterPhone": "Enter phone",
+  "EnterTitle": "Enter title",
+  "EnterDescription": "Enter description"
 }
