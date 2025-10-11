@@ -18,23 +18,41 @@ public static class DatabaseSeeder
         if (await context.Users.AnyAsync())
             return;
 
-        var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "participants.json");
+        // Determine tenant from connection string
+        var connectionString = context.Database.GetConnectionString();
+        var fileName = connectionString?.Contains("Erkekler") == true 
+            ? "participants_men.json" 
+            : "participants_women.json";
+        
+        var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
         
         if (!File.Exists(jsonPath))
         {
-            Console.WriteLine($"Seed file not found: {jsonPath}");
+            Console.WriteLine($"❌ Seed file not found: {jsonPath}");
+            return;
+        }
+        
+        Console.WriteLine($"📂 Loading seed data from: {fileName}");
+
+        var json = await File.ReadAllTextAsync(jsonPath);
+        Console.WriteLine($"📄 JSON file read, length: {json.Length}");
+        
+        var data = JsonSerializer.Deserialize<ParticipantsData>(json);
+        Console.WriteLine($"📊 Deserialized data - TotalCount: {data?.TotalCount}, Names count: {data?.Names?.Count}");
+
+        if (data?.Names == null || data.Names.Count == 0)
+        {
+            Console.WriteLine($"⚠️ No names found in JSON data!");
             return;
         }
 
-        var json = await File.ReadAllTextAsync(jsonPath);
-        var data = JsonSerializer.Deserialize<ParticipantsData>(json);
-
-        if (data?.Names == null || !data.Names.Any())
-            return;
-
+        Console.WriteLine($"👥 Creating {data.Names.Count} users...");
         var users = data.Names.Select(name => User.Create(name)).ToList();
 
+        Console.WriteLine($"💾 Adding users to context...");
         await context.Users.AddRangeAsync(users);
+        
+        Console.WriteLine($"💾 Saving changes...");
         await context.SaveChangesAsync();
 
         Console.WriteLine($"✅ {users.Count} users seeded successfully.");
@@ -66,6 +84,6 @@ public static class DatabaseSeeder
     {
         public int TotalCount { get; set; }
         public string? GeneratedAt { get; set; }
-        public List<string> Names { get; set; } = new();
+        public List<string> Names { get; set; } = [];
     }
 }

@@ -17,7 +17,7 @@
 - ✅ EF Core with SQLite + Configurations
 - ✅ Repository Pattern implementation
 - ✅ Database migrations
-- ✅ Design-time DbContext factory
+- ✅ Design-time DbContext factory (removed in Phase 5.1)
 
 ### Phase 2: Core API - COMPLETED
 - ✅ Carter Minimal API endpoints
@@ -62,11 +62,19 @@
 - ✅ Clean Architecture enforcement (Web → API only, no Infrastructure reference)
 - ✅ Cookie forwarding from Web to API
 
+**Phase 5.1: Database Seeding Improvements - COMPLETED ✅**
+- ✅ Tenant-specific seed files (participants_men.json / participants_women.json)
+- ✅ DatabaseSeeder reads tenant from connection string
+- ✅ Removed DefaultConnection fallback (tenant required)
+- ✅ Removed AttendDbContextFactory (no longer needed)
+- ✅ AttendDb.db eliminated completely
+
 **Technical Implementation:**
 - Web project: No Infrastructure/Application/Domain references
 - API manages: Tenant resolution, cookie generation, authentication
 - Web: HTTP client consumer only with cookie forwarding
 - Data isolation: Complete separation per tenant database
+- Seed files: Tenant-specific JSON files in Infrastructure project
 
 ---
 
@@ -146,13 +154,18 @@
 
 ## 🐛 Known Issues
 
-1. **Localization**: Turkish character display issues in JSON (i̇ instead of İ)
+1. **Database Seeding**: User seeding currently not working despite proper file loading
+   - JSON files load successfully but Users table remains empty
+   - Events seed properly (7 events per tenant)
+   - Investigation needed for User.Create() or SaveChanges() issue
+
+2. **Localization**: Turkish character display issues in JSON (i̇ instead of İ)
    - Consider using RESX files instead of JSON
    
-2. **Navigation**: Some navigation links may not be implemented yet
+3. **Navigation**: Some navigation links may not be implemented yet
    - Users list/details pages need completion
    
-3. **Validation**: Client-side validation needs enhancement
+4. **Validation**: Client-side validation needs enhancement
    - Add JavaScript validation for forms
 
 ---
@@ -289,5 +302,5 @@ Attendances
 
 ---
 
-*Last Updated: January 11, 2025*
-*Status: Phase 1-5 Complete ✅, Phase 6-10 Pending*
+*Last Updated: October 11, 2025*
+*Status: Phase 1-5 Complete ✅ (including 5.1 improvements), Phase 6-10 Pending*

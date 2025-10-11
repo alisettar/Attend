@@ -10,7 +10,7 @@ public class Event : Entity
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation
-    public List<Attendance> Attendances { get; set; } = new();
+    public List<Attendance> Attendances { get; set; } = [];
 
     public static Event Create(
         string title,

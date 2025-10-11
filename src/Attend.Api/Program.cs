@@ -19,9 +19,12 @@ builder.Services.Configure<TenantsConfiguration>(
 // DbContext with dynamic connection string based on tenant
 builder.Services.AddDbContext<AttendDbContext>((serviceProvider, options) =>
 {
-    var tenantService = serviceProvider.GetService<Attend.Application.Interfaces.ITenantService>();
-    var connectionString = tenantService?.GetConnectionString() 
-        ?? builder.Configuration.GetConnectionString("DefaultConnection")!;
+    var tenantService = serviceProvider.GetRequiredService<Attend.Application.Interfaces.ITenantService>();
+    var connectionString = tenantService.GetConnectionString();
+    
+    if (string.IsNullOrEmpty(connectionString))
+        throw new InvalidOperationException("Tenant connection string not found! Ensure tenant is properly configured.");
+    
     options.UseSqlite(connectionString);
 }, ServiceLifetime.Scoped);
 
