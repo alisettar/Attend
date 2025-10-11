@@ -4,8 +4,8 @@
 ### Project Information
 - **Project Location**: `C:\Users\Alisettar\source\repos\Attend\`
 - **Version Control**: Git
-- **Current Status**: Phase 1-4 Completed ✅
-- **Database**: SQLite with 400+ seeded users and 7 events
+- **Current Status**: Phase 5 Completed ✅
+- **Database**: SQLite Multi-Tenant (Database per Tenant)
 
 ---
 
@@ -14,18 +14,13 @@
 ### Phase 1: Core Foundation - COMPLETED
 - ✅ Clean Architecture structure (Domain, Application, Infrastructure, API, Web)
 - ✅ Domain entities with factory methods
-  - User (Name required, Email/Phone optional, QRCode auto-generated)
-  - Event (Title, Description, Date)
-  - Attendance (UserId, EventId, CheckedIn, Status)
 - ✅ EF Core with SQLite + Configurations
 - ✅ Repository Pattern implementation
 - ✅ Database migrations
+- ✅ Design-time DbContext factory
 
 ### Phase 2: Core API - COMPLETED
 - ✅ Carter Minimal API endpoints
-  - Users: GET, POST, PUT, DELETE
-  - Events: GET, POST, PUT, DELETE  
-  - Attendances: Register, CheckIn, GetAttendees
 - ✅ CQRS with MediatR (Commands & Queries)
 - ✅ FluentValidation pipeline
 - ✅ Global exception handling
@@ -47,24 +42,62 @@
 - ✅ Mobile-responsive scanner interface
 - ✅ Auto QRCode generation for users (USER-{GUID})
 
-### Database Seeding - COMPLETED
-- ✅ 400 participants from participants.json
-- ✅ 7 pre-configured events (2024-2025 & 2025-2026 academic years)
-- ✅ Auto-seed on application startup
+### Phase 5: Multi-Tenant Architecture - COMPLETED ✅
+**Architecture Design:**
+- ✅ Multiple SQLite databases (same schema, different data)
+- ✅ Tenant identification via hard-coded username mapping
+- ✅ Dynamic connection string resolution at runtime
+- ✅ Tenant context service (ITenantService, TenantService)
+- ✅ Scoped DbContext per request based on tenant
+
+**Implementation:**
+- ✅ ITenantService interface and TenantService implementation
+- ✅ Tenant configuration in appsettings.json
+- ✅ DbContext registration with dynamic connection string
+- ✅ TenantMiddleware (cookie + header support)
+- ✅ Separate migration/seeding for each tenant database
+- ✅ API Auth endpoints (/api/auth/login, /api/auth/logout)
+- ✅ Cookie-based authentication (API-managed)
+- ✅ Web authentication middleware
+- ✅ Clean Architecture enforcement (Web → API only, no Infrastructure reference)
+- ✅ Cookie forwarding from Web to API
+
+**Technical Implementation:**
+- Web project: No Infrastructure/Application/Domain references
+- API manages: Tenant resolution, cookie generation, authentication
+- Web: HTTP client consumer only with cookie forwarding
+- Data isolation: Complete separation per tenant database
 
 ---
 
 ## 🚧 Pending Features
 
-### Phase 5: Admin Authentication - NOT STARTED
-**Priority: Medium**
-- [ ] Cookie-based authentication
-- [ ] Admin login/logout pages
-- [ ] Protected routes middleware
-- [ ] Admin dashboard with statistics
-- [ ] Admin credentials in appsettings.json
+### Phase 6: Admin Dashboard - NOT STARTED
+**Priority: High**
+- [ ] Admin role management
+- [ ] Protected routes for admin actions
+- [ ] Bulk operations (import/export users)
+- [ ] Event management enhancements
+- [ ] Attendance reports and analytics
+- [ ] Admin-only pages
 
-### Phase 6: Messaging Integration - NOT STARTED
+### Phase 7: User Management - NOT STARTED
+**Priority: High**
+- [ ] User list page with search/filter
+- [ ] User details page with QR code display
+- [ ] User edit functionality
+- [ ] User profile pages
+- [ ] QR code format enhancement (EVENT-{eventId}|USER-{userId})
+
+### Phase 8: Event Enhancements - NOT STARTED
+**Priority: Medium**
+- [ ] Event capacity limits
+- [ ] Event registration workflow
+- [ ] Event details page with attendee list
+- [ ] Event categories/tags
+- [ ] Advanced event filtering
+
+### Phase 9: Messaging Integration - NOT STARTED
 **Priority: Low**
 - [ ] QRCode image generation service
 - [ ] WhatsApp integration (Twilio/Meta Business API)
@@ -72,13 +105,14 @@
 - [ ] Send QR codes after registration
 - [ ] Event reminder notifications
 
-### Phase 7: Deployment - NOT STARTED
+### Phase 10: Deployment - NOT STARTED
 **Priority: High**
 - [ ] Azure App Service configuration
-- [ ] Environment variables setup
+- [ ] Environment variables setup for tenant configs
 - [ ] HTTPS enforcement
-- [ ] Production database migration
+- [ ] Production database migration (all tenants)
 - [ ] CI/CD pipeline (.github/workflows)
+- [ ] Tenant database backup strategy
 
 ---
 
@@ -125,6 +159,8 @@
 
 ## 📊 Database Schema (Current)
 
+**Schema applies to ALL tenant databases:**
+
 ```sql
 Users
   - Id (Guid, PK)
@@ -151,6 +187,11 @@ Attendances
   - Unique constraint on (UserId, EventId)
 ```
 
+**Multi-Tenant Databases:**
+- AttendDb_Erkekler.db (Tenant1)
+- AttendDb_Kadinlar.db (Tenant2)
+- Same structure, isolated data
+
 ---
 
 ## 🔧 Tech Stack
@@ -161,7 +202,7 @@ Attendances
 - MediatR (CQRS)
 - FluentValidation
 - Entity Framework Core 9.0
-- SQLite
+- SQLite (Multi-Tenant)
 
 ### Frontend
 - ASP.NET Core MVC
@@ -177,22 +218,24 @@ Attendances
 - Repository Pattern
 - Factory Pattern
 - Dependency Injection
+- **Multi-Tenant (Database-per-Tenant)**
 
 ---
 
 ## 📝 Next Steps
 
-### Immediate (This Week)
-1. Complete User management pages (List, Details, Edit)
-2. Add event registration workflow
-3. Implement proper QR code format with event info
-4. Add attendee list to event details page
+### Immediate (This Week) - Phase 6
+1. Admin dashboard implementation
+2. User management pages (List, Details, Edit)
+3. Enhanced event management
+4. Attendance reports
 
 ### Short-term (Next 2 Weeks)
-1. Implement admin authentication
-2. Create admin dashboard
-3. Add data export features
-4. Fix localization character issues
+1. QR code format improvements
+2. Event registration workflow
+3. Search and filtering
+4. Data export features
+5. Fix localization character issues
 
 ### Long-term (Next Month)
 1. Messaging integration (WhatsApp/Telegram)
@@ -205,18 +248,46 @@ Attendances
 ## 🚀 Deployment Strategy
 
 ### Development
-- Local: SQLite database (AttendDb.db)
+- Local: Multiple SQLite databases (one per tenant)
 - API: http://localhost:5025
 - Web: http://localhost:5xxx
+- Tenant databases: AttendDb_Erkekler.db, AttendDb_Kadinlar.db
 
 ### Production (Planned)
 - Azure App Service (Free Tier) × 2
   - API: attend-api.azurewebsites.net
   - Web: attend-web.azurewebsites.net
-- SQLite file storage on Azure
-- Environment-based configuration
+- Multiple SQLite file storage on Azure (one per tenant)
+- Environment-based configuration with tenant settings
+- Automated backup for all tenant databases
 
 ---
 
-*Last Updated: January 4, 2025*
-*Status: Phase 1-4 Complete, Phase 5-7 Pending*
+## 🏗️ Multi-Tenant Architecture
+
+**Database-per-Tenant Strategy:**
+- Complete data isolation
+- Easy backup/restore per tenant
+- No cross-tenant data leak risk
+- Independent scaling per tenant
+
+**Authentication Flow:**
+1. User enters username on Web login page
+2. Web sends POST to API `/api/auth/login`
+3. API resolves tenant by username
+4. API sets `TenantId` and `Username` cookies
+5. API returns success
+6. All subsequent Web → API requests include cookies
+7. API TenantMiddleware reads cookie and sets tenant context
+8. DbContext connects to correct tenant database
+
+**Clean Architecture Enforcement:**
+- Web: Only references API via HTTP
+- API: Manages tenant resolution and authentication
+- Infrastructure: Contains tenant service
+- No cross-cutting concerns between Web and Infrastructure
+
+---
+
+*Last Updated: January 11, 2025*
+*Status: Phase 1-5 Complete ✅, Phase 6-10 Pending*

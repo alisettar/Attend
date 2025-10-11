@@ -1,0 +1,25 @@
+namespace Attend.Web.Handlers;
+
+public class TenantHttpClientHandler : DelegatingHandler
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public TenantHttpClientHandler(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+
+    protected override async Task<HttpResponseMessage> SendAsync(
+        HttpRequestMessage request, 
+        CancellationToken cancellationToken)
+    {
+        var tenantId = _httpContextAccessor.HttpContext?.Request.Cookies["TenantId"];
+        
+        if (!string.IsNullOrEmpty(tenantId))
+        {
+            request.Headers.Add("X-Tenant-Id", tenantId);
+        }
+
+        return await base.SendAsync(request, cancellationToken);
+    }
+}

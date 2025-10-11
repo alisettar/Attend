@@ -1,6 +1,8 @@
 using Attend.Web.Services;
 using Attend.Web.Services.Interfaces;
 using Attend.Web.Localization;
+using Attend.Web.Handlers;
+using Attend.Web.Middleware;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
@@ -11,7 +13,6 @@ builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 
-// JSON-based Localization
 builder.Services.AddSingleton<IStringLocalizerFactory, JsonStringLocalizerFactory>();
 
 builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -28,13 +29,16 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.ApplyCurrentCultureToResponseHeaders = true;
 });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<CookieForwardHandler>();
+
 var apiBaseUrl = builder.Configuration.GetValue<string>("ApiSettings:BaseUrl") ?? "http://localhost:5025/";
 builder.Services.AddHttpClient("AttendApi", client =>
 {
     client.BaseAddress = new Uri(apiBaseUrl);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
     client.Timeout = TimeSpan.FromSeconds(30);
-});
+}).AddHttpMessageHandler<CookieForwardHandler>();
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
@@ -50,8 +54,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRequestLocalization();
+
+// Authentication middleware
+app.UseMiddleware<AuthenticationMiddleware>();
 
 app.UseRouting();
 app.UseAuthorization();

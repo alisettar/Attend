@@ -1,17 +1,29 @@
-using Carter;
-using Microsoft.EntityFrameworkCore;
 using Attend.Api.Middleware;
 using Attend.Application;
+using Attend.Domain.Configuration;
 using Attend.Infrastructure;
-using Attend.Infrastructure.Persistence;
 using Attend.Infrastructure.Data;
+using Attend.Infrastructure.Middleware;
+using Attend.Infrastructure.Persistence;
+using Carter;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<AttendDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Configure Tenant Settings
+builder.Services.Configure<TenantsConfiguration>(
+    builder.Configuration.GetSection("TenantsConfiguration"));
+
+// DbContext with dynamic connection string based on tenant
+builder.Services.AddDbContext<AttendDbContext>((serviceProvider, options) =>
+{
+    var tenantService = serviceProvider.GetService<Attend.Application.Interfaces.ITenantService>();
+    var connectionString = tenantService?.GetConnectionString() 
+        ?? builder.Configuration.GetConnectionString("DefaultConnection")!;
+    options.UseSqlite(connectionString);
+}, ServiceLifetime.Scoped);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure();
@@ -22,28 +34,35 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>().AddProblemDetails
 
 var app = builder.Build();
 
-// Auto-migrate and seed database
+// Apply migrations and seed for ALL tenant databases
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AttendDbContext>();
-    try
+    var tenantsConfig = scope.ServiceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<TenantsConfiguration>>();
+
+    foreach (var (tenantId, tenantConfig) in tenantsConfig.Value.Tenants)
     {
-        Console.WriteLine("🔄 Applying migrations...");
-        await context.Database.MigrateAsync();
-        Console.WriteLine("✅ Migrations applied.");
+        Console.WriteLine($"🔄 Processing tenant: {tenantConfig.Name} ({tenantId})");
         
-        Console.WriteLine("🔄 Seeding database...");
-        await DatabaseSeeder.SeedAsync(context);
-        Console.WriteLine("✅ Database seeded.");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"❌ Migration/Seed error: {ex.Message}");
-        Console.WriteLine($"Stack trace: {ex.StackTrace}");
-        
-        if (ex.InnerException != null)
+        try
         {
-            Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+            // Create a new scope for each tenant
+            using var tenantScope = app.Services.CreateScope();
+            var tenantService = tenantScope.ServiceProvider.GetRequiredService<Attend.Application.Interfaces.ITenantService>();
+            tenantService.SetTenantId(tenantId);
+            
+            var context = tenantScope.ServiceProvider.GetRequiredService<AttendDbContext>();
+            
+            Console.WriteLine($"  🔄 Applying migrations...");
+            await context.Database.MigrateAsync();
+            Console.WriteLine($"  ✅ Migrations applied.");
+            
+            Console.WriteLine($"  🔄 Seeding database...");
+            await DatabaseSeeder.SeedAsync(context);
+            Console.WriteLine($"  ✅ Database seeded.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"  ❌ Error: {ex.Message}");
         }
     }
 }
@@ -52,6 +71,9 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+// Add tenant middleware BEFORE other middleware
+app.UseMiddleware<TenantMiddleware>();
 
 app.UseExceptionHandler();
 app.MapCarter();
