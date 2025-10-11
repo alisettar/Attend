@@ -54,5 +54,13 @@
   "Status": "Durum",
   "Registered": "Kayıtlı",
   "CheckedIn": "Giriş Yapıldı",
-  "Cancelled": "İptal Edildi"
+  "Cancelled": "İptal Edildi",
+  "CreateUser": "Kullanıcı Oluştur",
+  "SearchUsers": "Kullanıcı ara...",
+  "SearchEvents": "Etkinlik ara...",
+  "NoUsersFound": "Kullanıcı bulunamadı",
+  "NoEventsFound": "Etkinlik bulunamadı",
+  "ConfirmDelete": "Silmek istediğinize emin misiniz?",
+  "Details": "Detaylar",
+  "QRCode": "QR Kod"
 }

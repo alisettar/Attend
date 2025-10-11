@@ -1,18 +1,20 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 @model PaginatedResponse<UserViewModel>
 
 @{
-    ViewData["Title"] = "Users";
+    ViewData["Title"] = Localizer["Users"];
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Users</h2>
-    <a asp-action="Create" class="btn btn-primary">Create User</a>
+    <h2>@Localizer["Users"]</h2>
+    <a asp-action="Create" class="btn btn-primary">@Localizer["CreateUser"]</a>
 </div>
 
 <form method="get" class="mb-4">
     <div class="input-group">
-        <input type="text" name="search" class="form-control" placeholder="Search users..." value="@ViewBag.SearchTerm" />
-        <button type="submit" class="btn btn-outline-secondary">Search</button>
+        <input type="text" name="search" class="form-control" placeholder="@Localizer["SearchUsers"]" value="@ViewBag.SearchTerm" />
+        <button type="submit" class="btn btn-outline-secondary">@Localizer["Search"]</button>
     </div>
 </form>
 
@@ -21,11 +23,11 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>QR Code</th>
-                <th>Actions</th>
+                <th>@Localizer["Name"]</th>
+                <th>@Localizer["Email"]</th>
+                <th>@Localizer["Phone"]</th>
+                <th>@Localizer["QRCode"]</th>
+                <th>@Localizer["Actions"]</th>
             </tr>
         </thead>
         <tbody>
@@ -37,9 +39,9 @@
                     <td>@user.Phone</td>
                     <td><code>@user.QRCode</code></td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">Edit</a>
+                        <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
                         <form asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this user?')">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["ConfirmDelete"]')">@Localizer["Delete"]</button>
                         </form>
                     </td>
                 </tr>
@@ -48,23 +50,47 @@
     </table>
 
     <nav>
-        <ul class="pagination">
+        <ul class="pagination justify-content-center">
             <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
-                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-search="@ViewBag.SearchTerm">Previous</a>
+                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page - 1)" asp-route-search="@ViewBag.SearchTerm">@Localizer["Previous"]</a>
             </li>
-            @for (int i = 1; i <= Model.TotalPages; i++)
+            
+            @if (Model.Page > 3)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="1" asp-route-search="@ViewBag.SearchTerm">1</a>
+                </li>
+                @if (Model.Page > 4)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+            }
+            
+            @for (int i = Math.Max(1, Model.Page - 2); i <= Math.Min(Model.TotalPages, Model.Page + 2); i++)
             {
                 <li class="page-item @(i == Model.Page ? "active" : "")">
                     <a class="page-link" asp-action="Index" asp-route-page="@i" asp-route-search="@ViewBag.SearchTerm">@i</a>
                 </li>
             }
+            
+            @if (Model.Page < Model.TotalPages - 2)
+            {
+                @if (Model.Page < Model.TotalPages - 3)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+                <li class="page-item">
+                    <a class="page-link" asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-search="@ViewBag.SearchTerm">@Model.TotalPages</a>
+                </li>
+            }
+            
             <li class="page-item @(Model.HasNext ? "" : "disabled")">
-                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-search="@ViewBag.SearchTerm">Next</a>
+                <a class="page-link" asp-action="Index" asp-route-page="@(Model.Page + 1)" asp-route-search="@ViewBag.SearchTerm">@Localizer["Next"]</a>
             </li>
         </ul>
     </nav>
 }
 else
 {
-    <p class="text-muted">No users found.</p>
+    <p class="text-muted">@Localizer["NoUsersFound"]</p>
 }

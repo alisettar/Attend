@@ -20,8 +20,8 @@ public static class DatabaseSeeder
 
         var connectionString = context.Database.GetConnectionString();
         var fileName = connectionString?.Contains("Erkekler") == true 
-            ? "participants_men.json" 
-            : "participants_women.json";
+            ? @"Data/participants_men.json" 
+            : @"Data/participants_women.json";
         
         var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
         
@@ -49,8 +49,8 @@ public static class DatabaseSeeder
 
         var connectionString = context.Database.GetConnectionString();
         var fileName = connectionString?.Contains("Erkekler") == true 
-            ? "events_men.json" 
-            : "events_women.json";
+            ? @"Data/events_men.json"
+            : @"Data/events_women.json";
         
         var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
         

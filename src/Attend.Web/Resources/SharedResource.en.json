@@ -54,5 +54,13 @@
   "Status": "Status",
   "Registered": "Registered",
   "CheckedIn": "Checked In",
-  "Cancelled": "Cancelled"
+  "Cancelled": "Cancelled",
+  "CreateUser": "Create User",
+  "SearchUsers": "Search users...",
+  "SearchEvents": "Search events...",
+  "NoUsersFound": "No users found",
+  "NoEventsFound": "No events found",
+  "ConfirmDelete": "Are you sure you want to delete?",
+  "Details": "Details",
+  "QRCode": "QR Code"
 }
