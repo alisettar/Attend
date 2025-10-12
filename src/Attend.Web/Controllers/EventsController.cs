@@ -81,16 +81,25 @@ public class EventsController(IEventService eventService, IAttendanceService att
         return View(model);
     }
 
-    public async Task<IActionResult> Details(Guid id, int page = 1)
+    public async Task<IActionResult> Details(Guid id, int page = 1, string status = "")
     {
         var @event = await eventService.GetEventByIdAsync(id);
         if (@event == null)
             return NotFound();
 
         ViewBag.Event = @event;
+        ViewBag.StatusFilter = status;
         
         var request = new PaginationRequest(page - 1, 10);
         var attendees = await attendanceService.GetEventAttendeesAsync(id, request);
+        
+        // Client-side filtering for now
+        if (!string.IsNullOrEmpty(status))
+        {
+            attendees.Items = attendees.Items.Where(a => a.Status == status).ToList();
+            attendees.TotalCount = attendees.Items.Count;
+        }
+        
         return View(attendees);
     }
 

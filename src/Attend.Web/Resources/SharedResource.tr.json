@@ -74,5 +74,16 @@
   "DownloadQR": "QR Kodu İndir",
   "Statistics": "İstatistikler",
   "TotalAttendance": "Toplam Katılım",
-  "QRCodeNotGenerated": "QR kod oluşturulmamış"
+  "QRCodeNotGenerated": "QR kod oluşturulmamış",
+  "EventDetails": "Etkinlik Detayları",
+  "BackToEvents": "Etkinliklere Dön",
+  "TotalRegistered": "Toplam Kayıt",
+  "TotalCheckedIn": "Giriş Yapan",
+  "TotalCancelled": "İptal Edilen",
+  "FilterByStatus": "Duruma Göre Filtrele",
+  "AllStatuses": "Tüm Durumlar",
+  "CheckInTime": "Giriş Zamanı",
+  "NoAttendeesYet": "Henüz katılımcı yok",
+  "ShowingResults": "Gösterilen sonuçlar",
+  "AttendeeList": "Katılımcı Listesi"
 }

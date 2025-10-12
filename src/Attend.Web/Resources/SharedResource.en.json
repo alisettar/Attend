@@ -74,5 +74,16 @@
   "DownloadQR": "Download QR",
   "Statistics": "Statistics",
   "TotalAttendance": "Total Attendance",
-  "QRCodeNotGenerated": "QR code not generated"
+  "QRCodeNotGenerated": "QR code not generated",
+  "EventDetails": "Event Details",
+  "BackToEvents": "Back to Events",
+  "TotalRegistered": "Total Registered",
+  "TotalCheckedIn": "Total Checked In",
+  "TotalCancelled": "Total Cancelled",
+  "FilterByStatus": "Filter by Status",
+  "AllStatuses": "All Statuses",
+  "CheckInTime": "Check-in Time",
+  "NoAttendeesYet": "No attendees yet",
+  "ShowingResults": "Showing results",
+  "AttendeeList": "Attendee List"
 }
