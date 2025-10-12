@@ -26,11 +26,15 @@ jobs:
       run: dotnet build src/Attend.Web/Attend.Web.csproj --configuration Release --no-restore
     
     - name: Publish
-      run: dotnet publish src/Attend.Web/Attend.Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/web
+      run: dotnet publish src/Attend.Web/Attend.Web.csproj -c Release -o ./web-publish
+    
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: 'attend-web-ahmet'
-        publish-profile: ${{ secrets.AZURE_WEB_PUBLISH_PROFILE }}
-        package: ${{env.DOTNET_ROOT}}/web
+        package: ./web-publish
