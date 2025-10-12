@@ -9,7 +9,7 @@ using Carter;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//test
 builder.Services.AddOpenApi();
 
 // Configure Tenant Settings
