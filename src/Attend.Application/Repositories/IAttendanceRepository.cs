@@ -8,6 +8,7 @@ public interface IAttendanceRepository
     Task<Attendance?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<Attendance?> GetByUserAndEventAsync(Guid userId, Guid eventId, CancellationToken cancellationToken);
     Task<Attendance?> GetActiveAttendanceByUserAsync(Guid userId, CancellationToken cancellationToken);
+    Task<List<Attendance>> GetAllAsync(CancellationToken cancellationToken);
     Task<List<Attendance>> GetByEventIdAsync(Guid eventId, CancellationToken cancellationToken);
     Task<List<Attendance>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken);
     Task<(List<Attendance> items, long totalCount)> GetPaginatedByEventAsync(Guid eventId, PaginationRequest request, CancellationToken cancellationToken = default);

@@ -31,15 +31,15 @@ public record UserViewModel(
 public record UserCreateViewModel
 {
     public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
 }
 
 public record UserUpdateViewModel
 {
     public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
 }
 
 public record EventViewModel(
@@ -77,3 +77,25 @@ public record CheckInResultViewModel(
     string UserName,
     bool IsNewCheckIn,
     string Status);
+
+public record DashboardStatisticsViewModel(
+    int TotalEvents,
+    int TotalUsers,
+    int TotalAttendances,
+    int TotalCheckedIn,
+    double CheckInRate,
+    List<TopEventViewModel> TopEvents,
+    List<TopUserViewModel> TopUsers);
+
+public record TopEventViewModel(
+    Guid Id,
+    string Title,
+    DateTime Date,
+    int AttendanceCount,
+    int CheckedInCount);
+
+public record TopUserViewModel(
+    Guid Id,
+    string Name,
+    int AttendanceCount,
+    int CheckedInCount);

@@ -26,6 +26,12 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
             .OrderByDescending(a => a.Event.Date)
             .FirstOrDefaultAsync(cancellationToken);
 
+    public async Task<List<Attendance>> GetAllAsync(CancellationToken cancellationToken)
+        => await context.Attendances
+            .Include(a => a.User)
+            .Include(a => a.Event)
+            .ToListAsync(cancellationToken);
+
     public async Task<List<Attendance>> GetByEventIdAsync(Guid eventId, CancellationToken cancellationToken)
         => await context.Attendances
             .Include(a => a.User)

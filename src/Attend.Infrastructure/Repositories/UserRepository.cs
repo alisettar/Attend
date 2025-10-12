@@ -34,6 +34,9 @@ public class UserRepository(AttendDbContext context) : IUserRepository
             .OrderBy(u => u.Name)
             .ToListAsync(cancellationToken);
 
+    public async Task<int> CountAsync(CancellationToken cancellationToken)
+        => await context.Users.CountAsync(cancellationToken);
+
     public async Task<(List<User> items, long totalCount)> GetPaginatedAsync(
         PaginationRequest request, 
         CancellationToken cancellationToken = default)

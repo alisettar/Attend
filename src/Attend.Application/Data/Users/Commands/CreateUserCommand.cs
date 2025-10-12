@@ -13,10 +13,13 @@ public sealed class CreateUserCommandHandler(IUserRepository repository, IQRCode
 {
     public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        // Email uniqueness validation
-        var emailExists = await repository.ExistsByEmailAsync(request.Request.Email, null, cancellationToken);
-        if (emailExists)
-            throw new ValidationException("Email already in use.");
+        // Email uniqueness validation (only if email is provided)
+        if (!string.IsNullOrWhiteSpace(request.Request.Email))
+        {
+            var emailExists = await repository.ExistsByEmailAsync(request.Request.Email, null, cancellationToken);
+            if (emailExists)
+                throw new ValidationException("Email already in use.");
+        }
 
         var user = User.Create(
             name: request.Request.Name,
@@ -36,16 +39,13 @@ public sealed class CreateUserCommandValidator : AbstractValidator<CreateUserCom
     {
         RuleFor(x => x.Request.Name)
             .NotEmpty()
-            .WithMessage("Name cannot be empty.");
+            .WithMessage("Name cannot be empty.")
+            .MaximumLength(200)
+            .WithMessage("Name must not exceed 200 characters.");
         
         RuleFor(x => x.Request.Email)
-            .NotEmpty()
-            .WithMessage("Email cannot be empty.")
             .EmailAddress()
-            .WithMessage("Invalid email format.");
-            
-        RuleFor(x => x.Request.Phone)
-            .NotEmpty()
-            .WithMessage("Phone cannot be empty.");
+            .WithMessage("Invalid email format.")
+            .When(x => !string.IsNullOrWhiteSpace(x.Request.Email));
     }
 }

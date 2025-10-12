@@ -14,12 +14,16 @@ public class UsersController(IUserService userService) : Controller
         return View(users);
     }
 
-    public async Task<IActionResult> Details(Guid id)
+    public async Task<IActionResult> Details(Guid id, int page = 1)
     {
         var user = await userService.GetUserByIdAsync(id);
         if (user == null)
             return NotFound();
 
+        var attendanceRequest = new PaginationRequest(page - 1, 10);
+        var attendances = await userService.GetUserAttendancesAsync(id, attendanceRequest);
+        
+        ViewBag.Attendances = attendances;
         return View(user);
     }
 

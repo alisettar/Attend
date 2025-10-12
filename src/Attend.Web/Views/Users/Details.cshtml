@@ -109,3 +109,119 @@
         </div>
     </div>
 </div>
+
+@* Attendance History *@
+@{
+    var attendances = ViewBag.Attendances as PaginatedResponse<AttendanceViewModel>;
+}
+
+@if (attendances != null && attendances.TotalCount > 0)
+{
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-calendar-check me-2"></i>@Localizer["AttendanceHistory"] (@attendances.TotalCount)
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th><i class="bi bi-calendar-event me-1"></i>@Localizer["Event"]</th>
+                            <th><i class="bi bi-info-circle me-1"></i>@Localizer["Status"]</th>
+                            <th><i class="bi bi-clock me-1"></i>@Localizer["CheckInTime"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var attendance in attendances.Items)
+                        {
+                            var badgeClass = attendance.Status switch
+                            {
+                                "CheckedIn" => "success",
+                                "Cancelled" => "danger",
+                                _ => "secondary"
+                            };
+                            <tr>
+                                <td>
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@attendance.EventId">
+                                        <strong>@attendance.EventTitle</strong>
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge bg-@badgeClass">
+                                        <i class="bi bi-@(attendance.Status == "CheckedIn" ? "check-circle" : attendance.Status == "Cancelled" ? "x-circle" : "clock") me-1"></i>
+                                        @Localizer[attendance.Status]
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (attendance.CheckedInAt.HasValue)
+                                    {
+                                        <span class="text-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>
+                                            @attendance.CheckedInAt.Value.ToString("dd MMM yyyy HH:mm")
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            
+            @* Pagination *@
+            @if (attendances.TotalPages > 1)
+            {
+                <nav aria-label="Page navigation" class="mt-3">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(attendances.Page == 1 ? "disabled" : "")">
+                            <a class="page-link" asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@(attendances.Page - 1)">
+                                @Localizer["Previous"]
+                            </a>
+                        </li>
+                        
+                        @for (int i = 1; i <= Math.Min(5, attendances.TotalPages); i++)
+                        {
+                            <li class="page-item @(attendances.Page == i ? "active" : "")">
+                                <a class="page-link" asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@i">@i</a>
+                            </li>
+                        }
+                        
+                        @if (attendances.TotalPages > 5)
+                        {
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            <li class="page-item @(attendances.Page == attendances.TotalPages ? "active" : "")">
+                                <a class="page-link" asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@attendances.TotalPages">@attendances.TotalPages</a>
+                            </li>
+                        }
+                        
+                        <li class="page-item @(attendances.Page == attendances.TotalPages ? "disabled" : "")">
+                            <a class="page-link" asp-action="Details" asp-route-id="@Model.Id" asp-route-page="@(attendances.Page + 1)">
+                                @Localizer["Next"]
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        </div>
+    </div>
+}
+else if (attendances != null)
+{
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4 class="mb-0">
+                <i class="bi bi-calendar-check me-2"></i>@Localizer["AttendanceHistory"]
+            </h4>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle me-2"></i>@Localizer["NoAttendanceHistory"]
+            </div>
+        </div>
+    </div>
+}

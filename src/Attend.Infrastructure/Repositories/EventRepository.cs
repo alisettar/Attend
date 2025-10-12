@@ -18,6 +18,9 @@ public class EventRepository(AttendDbContext context) : IEventRepository
             .OrderByDescending(e => e.Date)
             .ToListAsync(cancellationToken);
 
+    public async Task<int> CountAsync(CancellationToken cancellationToken)
+        => await context.Events.CountAsync(cancellationToken);
+
     public async Task<List<Event>> GetUpcomingEventsAsync(CancellationToken cancellationToken)
         => await context.Events
             .Where(e => e.Date >= DateTime.UtcNow)

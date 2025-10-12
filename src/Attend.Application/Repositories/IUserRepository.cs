@@ -9,6 +9,7 @@ public interface IUserRepository
     Task<User?> GetByQRCodeAsync(string qrCode, CancellationToken cancellationToken);
     Task<bool> ExistsByEmailAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
     Task<List<User>> GetAllAsync(CancellationToken cancellationToken);
+    Task<int> CountAsync(CancellationToken cancellationToken);
     Task<(List<User> items, long totalCount)> GetPaginatedAsync(PaginationRequest request, CancellationToken cancellationToken = default);
     Task AddAsync(User user, CancellationToken cancellationToken);
     Task UpdateAsync(User user, CancellationToken cancellationToken);

@@ -1,0 +1,4 @@
+wwwroot\css\site.css
+wwwroot\js\site.js
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\wwwroot\css\site.css
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\wwwroot\js\site.js

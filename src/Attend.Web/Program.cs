@@ -43,6 +43,7 @@ builder.Services.AddHttpClient("AttendApi", client =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var app = builder.Build();
 

@@ -19,13 +19,16 @@ public sealed class UpdateUserCommandHandler(IUserRepository repository)
         if (user == null)
             return false;
 
-        // Email uniqueness validation
-        var emailExists = await repository.ExistsByEmailAsync(
-            request.Request.Email, 
-            request.Request.Id.Value, 
-            cancellationToken);
-        if (emailExists)
-            throw new ValidationException("Email already in use.");
+        // Email uniqueness validation (only if email is provided)
+        if (!string.IsNullOrWhiteSpace(request.Request.Email))
+        {
+            var emailExists = await repository.ExistsByEmailAsync(
+                request.Request.Email, 
+                request.Request.Id.Value, 
+                cancellationToken);
+            if (emailExists)
+                throw new ValidationException("Email already in use.");
+        }
 
         User.Update(user,
             name: request.Request.Name,
@@ -47,16 +50,13 @@ public sealed class UpdateUserCommandValidator : AbstractValidator<UpdateUserCom
 
         RuleFor(x => x.Request.Name)
             .NotEmpty()
-            .WithMessage("Name cannot be empty.");
+            .WithMessage("Name cannot be empty.")
+            .MaximumLength(200)
+            .WithMessage("Name must not exceed 200 characters.");
         
         RuleFor(x => x.Request.Email)
-            .NotEmpty()
-            .WithMessage("Email cannot be empty.")
             .EmailAddress()
-            .WithMessage("Invalid email format.");
-            
-        RuleFor(x => x.Request.Phone)
-            .NotEmpty()
-            .WithMessage("Phone cannot be empty.");
+            .WithMessage("Invalid email format.")
+            .When(x => !string.IsNullOrWhiteSpace(x.Request.Email));
     }
 }

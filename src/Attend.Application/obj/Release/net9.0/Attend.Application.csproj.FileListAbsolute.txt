@@ -1,0 +1,16 @@
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\bin\Release\net9.0\Attend.Application.deps.json
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\bin\Release\net9.0\Attend.Application.dll
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\bin\Release\net9.0\Attend.Application.pdb
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\bin\Release\net9.0\Attend.Domain.dll
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\bin\Release\net9.0\Attend.Domain.pdb
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.csproj.AssemblyReference.cache
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.AssemblyInfoInputs.cache
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.AssemblyInfo.cs
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.csproj.CoreCompileInputs.cache
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.sourcelink.json
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.A.BE284B0A.Up2Date
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.dll
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\refint\Attend.Application.dll
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\Attend.Application.pdb
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Application\obj\Release\net9.0\ref\Attend.Application.dll

@@ -82,4 +82,30 @@ public class UserService(IHttpClientFactory httpClientFactory, ILogger<UserServi
         var response = await _httpClient.DeleteAsync($"/users/{id}");
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<PaginatedResponse<AttendanceViewModel>> GetUserAttendancesAsync(Guid userId, PaginationRequest request)
+    {
+        try
+        {
+            var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
+            var response = await _httpClient.GetAsync($"/users/{userId}/attendances{queryParams}");
+            response.EnsureSuccessStatusCode();
+            
+            var json = await response.Content.ReadAsStringAsync();
+            var apiResponse = JsonSerializer.Deserialize<ApiPaginationResponse<AttendanceViewModel>>(json, _jsonOptions)!;
+
+            return new PaginatedResponse<AttendanceViewModel>
+            {
+                Items = apiResponse.Items,
+                TotalCount = apiResponse.TotalCount,
+                Page = request.Page + 1,
+                PageSize = request.PageSize
+            };
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error getting user attendances");
+            throw new ApplicationException("Failed to get user attendances.");
+        }
+    }
 }
