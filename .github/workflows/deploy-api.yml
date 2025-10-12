@@ -29,11 +29,15 @@ jobs:
       run: dotnet build src/Attend.Api/Attend.Api.csproj --configuration Release --no-restore
     
     - name: Publish
-      run: dotnet publish src/Attend.Api/Attend.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/api
+      run: dotnet publish src/Attend.Api/Attend.Api.csproj -c Release -o ./api-publish
+    
+    - name: Login to Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
     
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v3
       with:
         app-name: 'attend-api-ahmet'
-        publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
-        package: ${{env.DOTNET_ROOT}}/api
+        package: ./api-publish
