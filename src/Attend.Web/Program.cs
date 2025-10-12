@@ -8,7 +8,7 @@ using Microsoft.Extensions.Localization;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//test
 builder.Services.AddControllersWithViews()
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();

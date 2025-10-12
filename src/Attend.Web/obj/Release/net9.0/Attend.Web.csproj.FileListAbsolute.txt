@@ -35,3 +35,4 @@ C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\obj\Release\net9.0\compres
 C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\obj\Release\net9.0\compressed\6yo0ev3x5x-{0}-j053qr9t4x-j053qr9t4x.gz
 C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\obj\Release\net9.0\swae.build.ex.cache
 C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\obj\Release\net9.0\compressed\t86yy872ea-{0}-brsbrgyazi-brsbrgyazi.gz
+C:\Users\Alisettar\source\repos\Attend\src\Attend.Web\bin\Release\net9.0\appsettings.Production.json
