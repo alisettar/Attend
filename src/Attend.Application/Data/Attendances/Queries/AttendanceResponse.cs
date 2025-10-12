@@ -11,7 +11,7 @@ public record AttendanceResponse(
     string EventTitle,
     bool CheckedIn,
     DateTime? CheckedInAt,
-    AttendanceStatus Status)
+    string Status)
 {
     public static AttendanceResponse FromDomain(Attendance attendance)
     {
@@ -23,7 +23,7 @@ public record AttendanceResponse(
             attendance.Event?.Title ?? string.Empty,
             attendance.CheckedIn,
             attendance.CheckedInAt,
-            attendance.Status);
+            attendance.Status.ToString());
     }
 
     public static List<AttendanceResponse> FromDomainList(List<Attendance> attendances)

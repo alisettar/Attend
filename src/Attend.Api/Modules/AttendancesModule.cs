@@ -2,6 +2,7 @@ using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation;
 using Attend.Application.Data;
 using Attend.Application.Data.Attendances.Commands;
 using Attend.Application.Data.Attendances.Queries;
@@ -74,13 +75,22 @@ public class AttendancesModule : ICarterModule
         return result ? TypedResults.Ok() : TypedResults.NotFound();
     }
 
-    private static async Task<Ok> CheckInByQRCode(
-        [FromBody] string qrCode,
+    private static async Task<Results<Ok<CheckInResult>, BadRequest<string>>> CheckInByQRCode(
+        [FromBody] CheckInRequest request,
         [FromServices] ISender sender,
         HttpContext context)
     {
-        await sender.Send(new CheckInByQRCodeCommand(qrCode), context.RequestAborted);
-        return TypedResults.Ok();
+        try
+        {
+            var result = await sender.Send(
+                new CheckInByQRCodeCommand(request.QRCode, request.EventId), 
+                context.RequestAborted);
+            return TypedResults.Ok(result);
+        }
+        catch (ValidationException ex)
+        {
+            return TypedResults.BadRequest(ex.Message);
+        }
     }
 
     private static async Task<Results<NoContent, NotFound>> CancelAttendance(
@@ -92,3 +102,5 @@ public class AttendancesModule : ICarterModule
         return result ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 }
+
+public record CheckInRequest(string QRCode, Guid EventId);

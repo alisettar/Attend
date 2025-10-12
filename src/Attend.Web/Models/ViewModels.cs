@@ -72,3 +72,8 @@ public record AttendanceViewModel(
     bool CheckedIn,
     DateTime? CheckedInAt,
     string Status);
+
+public record CheckInResultViewModel(
+    string UserName,
+    bool IsNewCheckIn,
+    string Status);

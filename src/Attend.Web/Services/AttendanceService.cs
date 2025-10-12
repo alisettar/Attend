@@ -100,12 +100,21 @@ public class AttendanceService(IHttpClientFactory httpClientFactory, ILogger<Att
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> CheckInByQRCodeAsync(string qrCode)
+    public async Task<CheckInResultViewModel> CheckInByQRCodeAsync(string qrCode, Guid eventId)
     {
-        var json = JsonSerializer.Serialize(qrCode, _jsonOptions);
+        var request = new { qrCode, eventId };
+        var json = JsonSerializer.Serialize(request, _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("/checkin/qrcode", content);
-        return response.IsSuccessStatusCode;
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new ApplicationException(error);
+        }
+        
+        var resultJson = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<CheckInResultViewModel>(resultJson, _jsonOptions)!;
     }
 
     public async Task<bool> CancelAttendanceAsync(Guid attendanceId)

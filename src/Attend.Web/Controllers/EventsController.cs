@@ -96,8 +96,14 @@ public class EventsController(IEventService eventService, IAttendanceService att
         // Client-side filtering for now
         if (!string.IsNullOrEmpty(status))
         {
-            attendees.Items = attendees.Items.Where(a => a.Status == status).ToList();
-            attendees.TotalCount = attendees.Items.Count;
+            var filteredItems = attendees.Items.Where(a => a.Status == status).ToList();
+            attendees = new PaginatedResponse<AttendanceViewModel>
+            {
+                Items = filteredItems,
+                TotalCount = filteredItems.Count,
+                Page = attendees.Page,
+                PageSize = attendees.PageSize
+            };
         }
         
         return View(attendees);

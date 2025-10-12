@@ -85,5 +85,19 @@
   "CheckInTime": "Check-in Time",
   "NoAttendeesYet": "No attendees yet",
   "ShowingResults": "Showing results",
-  "AttendeeList": "Attendee List"
+  "AttendeeList": "Attendee List",
+  "ScannerPage": "Scanner Page",
+  "SelectEvent": "Select Event",
+  "EnterQRCode": "Enter or Scan QR Code",
+  "ScanMode": "Scan Mode",
+  "USBScanner": "USB Scanner",
+  "CameraScanner": "Camera Scanner",
+  "CheckedInSuccessfully": "Checked in successfully",
+  "AlreadyCheckedIn": "Already checked in",
+  "NewRegistration": "New registration",
+  "Updated": "Updated",
+  "PleaseSelectEvent": "Please select an event first",
+  "ScanQROrEnterManually": "Scan QR code or enter manually",
+  "NoActiveEvents": "No active events available",
+  "ScanMode": "Scan Mode"
 }

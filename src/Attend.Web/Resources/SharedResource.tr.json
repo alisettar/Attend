@@ -85,5 +85,19 @@
   "CheckInTime": "Giriş Zamanı",
   "NoAttendeesYet": "Henüz katılımcı yok",
   "ShowingResults": "Gösterilen sonuçlar",
-  "AttendeeList": "Katılımcı Listesi"
+  "AttendeeList": "Katılımcı Listesi",
+  "ScannerPage": "Tarayıcı Sayfası",
+  "SelectEvent": "Etkinlik Seçin",
+  "EnterQRCode": "QR Kod Girin veya Tarayın",
+  "ScanMode": "Tarama Modu",
+  "USBScanner": "USB Tarayıcı",
+  "CameraScanner": "Kamera Tarayıcı",
+  "CheckedInSuccessfully": "Giriş başarılı",
+  "AlreadyCheckedIn": "Zaten giriş yapılmış",
+  "NewRegistration": "Yeni kayıt",
+  "Updated": "Güncellendi",
+  "PleaseSelectEvent": "Lütfen önce bir etkinlik seçin",
+  "ScanQROrEnterManually": "QR kodu tarayın veya manuel girin",
+  "NoActiveEvents": "Aktif etkinlik bulunmuyor",
+  "ScanMode": "Tarama Modu"
 }

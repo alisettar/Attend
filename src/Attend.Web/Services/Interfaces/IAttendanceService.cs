@@ -10,6 +10,6 @@ public interface IAttendanceService
     Task<Guid> RegisterAttendanceAsync(Guid userId, Guid eventId);
     Task<bool> CheckInAsync(Guid attendanceId);
     Task<bool> CheckInAsync(Guid eventId, Guid userId); // Overload for QR scanner
-    Task<bool> CheckInByQRCodeAsync(string qrCode);
+    Task<CheckInResultViewModel> CheckInByQRCodeAsync(string qrCode, Guid eventId);
     Task<bool> CancelAttendanceAsync(Guid attendanceId);
 }

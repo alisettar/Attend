@@ -72,7 +72,7 @@
 - ✅ Smart pagination (max 5 pages with ellipsis)
 - ✅ Complete localization for all UI pages
 
-### Phase 6: User Management & QR Generation - IN PROGRESS 🚧
+### Phase 6: User Management & QR Generation - COMPLETED ✅
 **Completed:**
 - ✅ User Details page with full information display
 - ✅ Backend QR code image generation (QRCoder library)
@@ -89,8 +89,40 @@
 - [ ] Protected routes for admin actions
 - [ ] Bulk operations (import/export users)
 - [ ] User bulk import from Excel/CSV
-- [ ] Event management enhancements
-- [ ] Attendance reports and analytics
+
+### Phase 7: Event Management - IN PROGRESS 🚧
+**Completed:**
+- ✅ Event Details page with attendee list
+- ✅ Event statistics (Total Registered, Checked In, Cancelled)
+- ✅ Status filtering (All/Registered/CheckedIn/Cancelled)
+- ✅ Pagination UI with smart ellipsis
+- ✅ Full TR/EN localization
+- ✅ Quick Check-in button (→ Scanner page)
+- ✅ Responsive table design with icons
+
+**Pending:**
+- [ ] Event capacity limits
+- [ ] Event registration workflow
+- [ ] Event categories/tags
+- [ ] Advanced event filtering
+- [ ] Edit event functionality improvements
+
+### Phase 8: QR Scanner Revision - COMPLETED ✅
+**Completed:**
+- ✅ Revised Scanner page (ScannerController)
+- ✅ Event selection dropdown (required)
+- ✅ USB Scanner support (keyboard emulation)
+- ✅ Auto-focus + refocus logic (smart focus management)
+- ✅ Camera Scanner integration (html5-qrcode)
+- ✅ Dual mode: USB/Camera toggle
+- ✅ Insert/Update logic (auto-register if not exists)
+- ✅ Duplicate check handling (AlreadyCheckedIn status)
+- ✅ User name + status feedback (3s auto-hide)
+- ✅ Backend: CheckInByQRCodeCommand with EventId
+- ✅ API: CheckInResult response (userName, isNewCheckIn, status)
+- ✅ AttendanceResponse.Status → string conversion
+- ✅ Full localization (30+ new keys)
+- ✅ Navbar and Home page links updated
 
 ---
 
