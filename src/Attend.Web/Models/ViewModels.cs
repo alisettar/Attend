@@ -24,7 +24,9 @@ public record UserViewModel(
     string Email,
     string Phone,
     string QRCode,
-    DateTime CreatedAt);
+    string? QRCodeImage,
+    DateTime CreatedAt,
+    int AttendanceCount = 0);
 
 public record UserCreateViewModel
 {

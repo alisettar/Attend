@@ -39,6 +39,7 @@
                     <td>@user.Phone</td>
                     <td><code>@user.QRCode</code></td>
                     <td>
+                        <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
                         <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
                         <form asp-action="Delete" asp-route-id="@user.Id" method="post" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["ConfirmDelete"]')">@Localizer["Delete"]</button>

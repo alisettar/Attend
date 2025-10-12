@@ -35,6 +35,7 @@ namespace Attend.Infrastructure.Migrations
                     Email = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     Phone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
                     QRCode = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    QRCodeImage = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>

@@ -14,6 +14,15 @@ public class UsersController(IUserService userService) : Controller
         return View(users);
     }
 
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var user = await userService.GetUserByIdAsync(id);
+        if (user == null)
+            return NotFound();
+
+        return View(user);
+    }
+
     public IActionResult Create()
     {
         return View(new UserCreateViewModel());

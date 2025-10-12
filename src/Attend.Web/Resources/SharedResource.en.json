@@ -68,5 +68,11 @@
   "EnterEmail": "Enter email",
   "EnterPhone": "Enter phone",
   "EnterTitle": "Enter title",
-  "EnterDescription": "Enter description"
+  "EnterDescription": "Enter description",
+  "UserDetails": "User Details",
+  "BackToList": "Back to List",
+  "DownloadQR": "Download QR",
+  "Statistics": "Statistics",
+  "TotalAttendance": "Total Attendance",
+  "QRCodeNotGenerated": "QR code not generated"
 }

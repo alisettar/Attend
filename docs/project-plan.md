@@ -4,7 +4,7 @@
 ### Project Information
 - **Project Location**: `C:\Users\Alisettar\source\repos\Attend\`
 - **Version Control**: Git
-- **Current Status**: Phase 5 Completed ✅
+- **Current Status**: Phase 6 In Progress 🚧
 - **Database**: SQLite Multi-Tenant (Database per Tenant)
 
 ---
@@ -62,56 +62,64 @@
 - ✅ Clean Architecture enforcement (Web → API only, no Infrastructure reference)
 - ✅ Cookie forwarding from Web to API
 
-**Phase 5.1: Database Seeding Improvements - COMPLETED ✅**
-- ✅ Tenant-specific seed files (participants_men.json / participants_women.json)
+**Phase 5.1: Database Seeding & Search Improvements - COMPLETED ✅**
+- ✅ Tenant-specific seed files (participants_men.json / participants_women.json, events_men.json / events_women.json)
 - ✅ DatabaseSeeder reads tenant from connection string
 - ✅ Removed DefaultConnection fallback (tenant required)
 - ✅ Removed AttendDbContextFactory (no longer needed)
-- ✅ AttendDb.db eliminated completely
+- ✅ Fixed user seeding with JsonSerializerOptions (PropertyNameCaseInsensitive)
+- ✅ Case-insensitive search (ToUpper for EF Core/SQLite compatibility)
+- ✅ Smart pagination (max 5 pages with ellipsis)
+- ✅ Complete localization for all UI pages
 
-**Technical Implementation:**
-- Web project: No Infrastructure/Application/Domain references
-- API manages: Tenant resolution, cookie generation, authentication
-- Web: HTTP client consumer only with cookie forwarding
-- Data isolation: Complete separation per tenant database
-- Seed files: Tenant-specific JSON files in Infrastructure project
+### Phase 6: User Management & QR Generation - IN PROGRESS 🚧
+**Completed:**
+- ✅ User Details page with full information display
+- ✅ Backend QR code image generation (QRCoder library)
+- ✅ User.QRCodeImage field (base64 PNG storage)
+- ✅ QRCodeService (IQRCodeService interface + implementation)
+- ✅ Automatic QR generation on user creation
+- ✅ QR generation during database seeding
+- ✅ QR code display and download functionality
+- ✅ User list with Details/Edit/Delete actions
+- ✅ Full localization support
+
+**Pending:**
+- [ ] Admin role management
+- [ ] Protected routes for admin actions
+- [ ] Bulk operations (import/export users)
+- [ ] User bulk import from Excel/CSV
+- [ ] Event management enhancements
+- [ ] Attendance reports and analytics
 
 ---
 
 ## 🚧 Pending Features
 
-### Phase 6: Admin Dashboard - NOT STARTED
+### Phase 7: Event Management - NOT STARTED
 **Priority: High**
-- [ ] Admin role management
-- [ ] Protected routes for admin actions
-- [ ] Bulk operations (import/export users)
-- [ ] Event management enhancements
-- [ ] Attendance reports and analytics
-- [ ] Admin-only pages
-
-### Phase 7: User Management - NOT STARTED
-**Priority: High**
-- [ ] User list page with search/filter
-- [ ] User details page with QR code display
-- [ ] User edit functionality
-- [ ] User profile pages
-- [ ] QR code format enhancement (EVENT-{eventId}|USER-{userId})
-
-### Phase 8: Event Enhancements - NOT STARTED
-**Priority: Medium**
+- [ ] Event details page with attendee list
 - [ ] Event capacity limits
 - [ ] Event registration workflow
-- [ ] Event details page with attendee list
 - [ ] Event categories/tags
 - [ ] Advanced event filtering
+- [ ] Edit event functionality
+
+### Phase 8: Attendance & Reports - NOT STARTED
+**Priority: High**
+- [ ] Attendance reports by event
+- [ ] Attendance reports by user
+- [ ] Export reports (Excel/PDF)
+- [ ] Statistics and analytics dashboard
+- [ ] Attendance history view
 
 ### Phase 9: Messaging Integration - NOT STARTED
-**Priority: Low**
-- [ ] QRCode image generation service
+**Priority: Medium**
 - [ ] WhatsApp integration (Twilio/Meta Business API)
 - [ ] Telegram bot setup
 - [ ] Send QR codes after registration
 - [ ] Event reminder notifications
+- [ ] Bulk messaging functionality
 
 ### Phase 10: Deployment - NOT STARTED
 **Priority: High**
@@ -127,46 +135,23 @@
 ## 📋 Technical Debt & Improvements
 
 ### High Priority
-- [ ] Add proper QR code format for attendance (EVENT-{eventId}|USER-{userId})
 - [ ] Implement event capacity limits
 - [ ] Add attendee registration workflow
-- [ ] Create user profile pages with QR code display
 - [ ] Add event details page with attendee list
-- [ ] Implement search and filtering on all list pages
-
-### Medium Priority
-- [ ] Add pagination controls to all lists
 - [ ] Implement soft delete for entities
 - [ ] Add audit logging (CreatedBy, UpdatedBy, DeletedAt)
+
+### Medium Priority
 - [ ] Create admin panel for bulk operations
 - [ ] Add data export functionality (Excel/PDF)
-- [ ] Implement email validation for optional email field
-
-### Low Priority
 - [ ] Add user avatars
 - [ ] Event categories/tags
 - [ ] Advanced reporting and analytics
+
+### Low Priority
 - [ ] Export attendance reports
 - [ ] Theme switcher (Dark/Light toggle)
-- [ ] Add Turkish character support improvements
-
----
-
-## 🐛 Known Issues
-
-1. **Database Seeding**: User seeding currently not working despite proper file loading
-   - JSON files load successfully but Users table remains empty
-   - Events seed properly (7 events per tenant)
-   - Investigation needed for User.Create() or SaveChanges() issue
-
-2. **Localization**: Turkish character display issues in JSON (i̇ instead of İ)
-   - Consider using RESX files instead of JSON
-   
-3. **Navigation**: Some navigation links may not be implemented yet
-   - Users list/details pages need completion
-   
-4. **Validation**: Client-side validation needs enhancement
-   - Add JavaScript validation for forms
+- [ ] Email notifications
 
 ---
 
@@ -181,6 +166,7 @@ Users
   - Email (string?, optional, max: 200)
   - Phone (string?, optional, max: 50)
   - QRCode (string, required, unique, max: 100)
+  - QRCodeImage (string?, optional, base64 PNG)
   - CreatedAt (DateTime)
 
 Events
@@ -216,12 +202,12 @@ Attendances
 - FluentValidation
 - Entity Framework Core 9.0
 - SQLite (Multi-Tenant)
+- QRCoder 1.6.0 (QR image generation)
 
 ### Frontend
 - ASP.NET Core MVC
 - Bootstrap 5.3.2 (Dark Theme)
 - Bootstrap Icons 1.11.1
-- html5-qrcode 2.3.8
 - JSON-based Localization (TR/EN)
 
 ### Patterns & Architecture
@@ -230,6 +216,7 @@ Attendances
 - CQRS Pattern
 - Repository Pattern
 - Factory Pattern
+- Service Pattern
 - Dependency Injection
 - **Multi-Tenant (Database-per-Tenant)**
 
@@ -237,18 +224,16 @@ Attendances
 
 ## 📝 Next Steps
 
-### Immediate (This Week) - Phase 6
-1. Admin dashboard implementation
-2. User management pages (List, Details, Edit)
-3. Enhanced event management
-4. Attendance reports
+### Immediate (This Week)
+1. Event Details page with attendee list
+2. Event registration workflow
+3. Attendance reports
 
 ### Short-term (Next 2 Weeks)
-1. QR code format improvements
-2. Event registration workflow
-3. Search and filtering
-4. Data export features
-5. Fix localization character issues
+1. Admin role management
+2. Bulk operations
+3. Data export features
+4. Event capacity limits
 
 ### Long-term (Next Month)
 1. Messaging integration (WhatsApp/Telegram)
@@ -294,13 +279,19 @@ Attendances
 7. API TenantMiddleware reads cookie and sets tenant context
 8. DbContext connects to correct tenant database
 
+**QR Code Generation:**
+- Backend generation using QRCoder library
+- Base64 PNG storage in database
+- Automatic generation on user creation and seeding
+- Ready for WhatsApp/Email integration
+
 **Clean Architecture Enforcement:**
 - Web: Only references API via HTTP
 - API: Manages tenant resolution and authentication
-- Infrastructure: Contains tenant service
+- Infrastructure: Contains tenant service and QR generation
 - No cross-cutting concerns between Web and Infrastructure
 
 ---
 
-*Last Updated: October 11, 2025*
-*Status: Phase 1-5 Complete ✅ (including 5.1 improvements), Phase 6-10 Pending*
+*Last Updated: October 12, 2025*
+*Status: Phase 1-5 Complete ✅, Phase 6 In Progress 🚧, Phase 7-10 Pending*

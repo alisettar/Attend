@@ -1,5 +1,6 @@
 using MediatR;
 using Attend.Application.Repositories;
+using Attend.Application.Services;
 using Attend.Domain.Entities;
 using FluentValidation;
 
@@ -7,7 +8,7 @@ namespace Attend.Application.Data.Users.Commands;
 
 public sealed record CreateUserCommand(UserRequest Request) : IRequest<Guid>;
 
-public sealed class CreateUserCommandHandler(IUserRepository repository) 
+public sealed class CreateUserCommandHandler(IUserRepository repository, IQRCodeService qrCodeService) 
     : IRequestHandler<CreateUserCommand, Guid>
 {
     public async Task<Guid> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -21,6 +22,8 @@ public sealed class CreateUserCommandHandler(IUserRepository repository)
             name: request.Request.Name,
             email: request.Request.Email,
             phone: request.Request.Phone);
+
+        user.QRCodeImage = qrCodeService.GenerateQRCodeImage(user.QRCode);
 
         await repository.AddAsync(user, cancellationToken);
         return user.Id;

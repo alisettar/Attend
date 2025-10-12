@@ -68,5 +68,11 @@
   "EnterEmail": "E-posta giriniz",
   "EnterPhone": "Telefon giriniz",
   "EnterTitle": "Başlık giriniz",
-  "EnterDescription": "Açıklama giriniz"
+  "EnterDescription": "Açıklama giriniz",
+  "UserDetails": "Kullanıcı Detayları",
+  "BackToList": "Listeye Dön",
+  "DownloadQR": "QR Kodu İndir",
+  "Statistics": "İstatistikler",
+  "TotalAttendance": "Toplam Katılım",
+  "QRCodeNotGenerated": "QR kod oluşturulmamış"
 }

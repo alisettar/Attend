@@ -29,6 +29,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.QRCode)
             .IsUnique();
 
+        builder.Property(u => u.QRCodeImage);
+
         builder.Property(u => u.CreatedAt)
             .IsRequired();
 

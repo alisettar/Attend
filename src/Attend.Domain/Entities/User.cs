@@ -8,6 +8,7 @@ public class User : Entity
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string QRCode { get; private set; } = string.Empty;
+    public string? QRCodeImage { get; set; } // Base64 PNG
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation

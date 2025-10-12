@@ -8,7 +8,9 @@ public record UserResponse(
     string? Email,
     string? Phone,
     string QRCode,
-    DateTime CreatedAt)
+    string? QRCodeImage,
+    DateTime CreatedAt,
+    int AttendanceCount)
 {
     public static UserResponse FromDomain(User user)
     {
@@ -18,7 +20,9 @@ public record UserResponse(
             user.Email,
             user.Phone,
             user.QRCode,
-            user.CreatedAt);
+            user.QRCodeImage,
+            user.CreatedAt,
+            user.Attendances?.Count ?? 0);
     }
 
     public static List<UserResponse> FromDomainList(List<User> users)

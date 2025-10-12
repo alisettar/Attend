@@ -1,5 +1,6 @@
 using Attend.Domain.Entities;
 using Attend.Infrastructure.Persistence;
+using Attend.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -35,7 +36,14 @@ public static class DatabaseSeeder
         if (data?.Names == null || data.Names.Count == 0)
             return;
 
-        var users = data.Names.Select(name => User.Create(name)).ToList();
+        var qrService = new QRCodeService();
+        var users = data.Names.Select(name => 
+        {
+            var user = User.Create(name);
+            user.QRCodeImage = qrService.GenerateQRCodeImage(user.QRCode);
+            return user;
+        }).ToList();
+        
         await context.Users.AddRangeAsync(users);
         await context.SaveChangesAsync();
 
