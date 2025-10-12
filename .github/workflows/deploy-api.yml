@@ -1,0 +1,39 @@
+name: Deploy API to Azure
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'src/Attend.Api/**'
+      - 'src/Attend.Application/**'
+      - 'src/Attend.Domain/**'
+      - 'src/Attend.Infrastructure/**'
+      - '.github/workflows/deploy-api.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Attend.Api/Attend.Api.csproj
+    
+    - name: Build
+      run: dotnet build src/Attend.Api/Attend.Api.csproj --configuration Release --no-restore
+    
+    - name: Publish
+      run: dotnet publish src/Attend.Api/Attend.Api.csproj -c Release -o ${{env.DOTNET_ROOT}}/api
+    
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'attend-api-ahmet'
+        publish-profile: ${{ secrets.AZURE_API_PUBLISH_PROFILE }}
+        package: ${{env.DOTNET_ROOT}}/api

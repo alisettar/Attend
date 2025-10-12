@@ -1,0 +1,36 @@
+name: Deploy Web to Azure
+
+on:
+  push:
+    branches: [ master ]
+    paths:
+      - 'src/Attend.Web/**'
+      - '.github/workflows/deploy-web.yml'
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '9.0.x'
+    
+    - name: Restore dependencies
+      run: dotnet restore src/Attend.Web/Attend.Web.csproj
+    
+    - name: Build
+      run: dotnet build src/Attend.Web/Attend.Web.csproj --configuration Release --no-restore
+    
+    - name: Publish
+      run: dotnet publish src/Attend.Web/Attend.Web.csproj -c Release -o ${{env.DOTNET_ROOT}}/web
+    
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v3
+      with:
+        app-name: 'attend-web-ahmet'
+        publish-profile: ${{ secrets.AZURE_WEB_PUBLISH_PROFILE }}
+        package: ${{env.DOTNET_ROOT}}/web

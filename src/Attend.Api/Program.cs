@@ -33,6 +33,27 @@ builder.Services.AddInfrastructure();
 
 builder.Services.AddCarter();
 
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        if (builder.Environment.IsDevelopment())
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+        else
+        {
+            policy.WithOrigins("https://attend-web-ahmet.azurewebsites.net")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader()
+                  .AllowCredentials();
+        }
+    });
+});
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>().AddProblemDetails();
 
 var app = builder.Build();
@@ -78,6 +99,7 @@ if (app.Environment.IsDevelopment())
 // Add tenant middleware BEFORE other middleware
 app.UseMiddleware<TenantMiddleware>();
 
+app.UseCors();
 app.UseExceptionHandler();
 app.MapCarter();
 
