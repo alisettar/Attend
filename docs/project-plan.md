@@ -138,6 +138,66 @@
 
 ## 🚧 Pending Features
 
+### Phase 14: Public Registration Form - IN PROGRESS ⭐
+**Priority: HIGH**
+
+**Tenant Hash System:**
+- [ ] Tenant hash/slug generation (erkekler → abc123xyz)
+- [ ] Update appsettings.json with tenant hash mappings
+- [ ] Tenant resolution by hash in public endpoints
+
+**Backend (API):**
+- [ ] PublicRegisterCommand (MediatR)
+- [ ] PublicRegisterCommandValidator (FluentValidation)
+  - [ ] TR phone format validation (+90 5XX XXX XX XX)
+  - [ ] Duplicate phone check (tenant-scoped)
+  - [ ] Name validation (required, max 200 chars)
+- [ ] Rate limiting middleware (IP-based, 5 req/min)
+- [ ] Google reCAPTCHA v3 integration
+- [ ] Public endpoint: POST /api/public/register/{tenantHash}
+
+**Frontend (Web):**
+- [ ] RegisterController (GET/POST actions)
+- [ ] Public registration form view
+  - [ ] Mobile-first responsive design
+  - [ ] Large touch targets (min 44px)
+  - [ ] Phone input masking (TR format)
+  - [ ] Auto-focus on name field
+  - [ ] Client-side validation
+- [ ] Success page with QR display
+  - [ ] QR code rendered from DB (base64)
+  - [ ] PNG download button
+  - [ ] WhatsApp share option (future: Phase 11)
+- [ ] KVKK Compliance pages:
+  - [ ] Privacy Policy page (/privacy-policy)
+  - [ ] Consent Text page (/consent-text)
+  - [ ] Checkbox for acceptance (required)
+  - [ ] Links to policy pages
+- [ ] Full TR/EN localization
+
+**Security & Compliance:**
+- [ ] Google reCAPTCHA v3 (spam prevention)
+- [ ] Rate limiting configuration
+- [ ] CSRF token validation
+- [ ] Input sanitization
+- [ ] KVKK compliance text
+- [ ] Açık Rıza Metni (explicit consent)
+
+**Testing:**
+- [ ] Unit tests (validator, command handler)
+- [ ] Integration tests (duplicate check, rate limit)
+- [ ] Mobile responsive testing
+- [ ] reCAPTCHA integration test
+
+**Notes:**
+- Public endpoint (no authentication required)
+- Tenant identified by hash in URL: /register/{tenantHash}
+- QR code displayed immediately after registration
+- Phone must be unique per tenant
+- KVKK checkbox required before submission
+
+---
+
 ### Phase 10: Event Management Enhancements - NOT STARTED
 **Priority: Medium**
 - [ ] Event capacity limits
@@ -231,9 +291,10 @@ Attendances
 ```
 
 **Multi-Tenant Databases:**
-- AttendDb_Erkekler.db (Tenant1)
-- AttendDb_Kadinlar.db (Tenant2)
+- AttendDb_Erkekler.db (Tenant: abc123xyz / Tenant1)
+- AttendDb_Kadinlar.db (Tenant: def456uvw / Tenant2)
 - Same structure, isolated data
+- **Tenant Hash Mapping**: Hash values used in public URLs for security
 
 ---
 
@@ -269,9 +330,13 @@ Attendances
 ## 📝 Next Steps
 
 ### Immediate (This Week)
-1. Event capacity management
-2. Admin role implementation
-3. Bulk operations planning
+1. **Phase 14: Public Registration Form** ⭐
+   - Tenant hash system
+   - Public registration endpoint
+   - KVKK compliance pages
+   - Google reCAPTCHA integration
+2. Mobile-responsive testing
+3. Rate limiting implementation
 
 ### Short-term (Next 2 Weeks)
 1. Bulk user import/export
@@ -337,5 +402,5 @@ Attendances
 
 ---
 
-*Last Updated: October 12, 2025*
-*Status: Phase 1-9, 13 Complete ✅ | Phase 10-12 Pending | DEPLOYED TO AZURE 🚀*
+*Last Updated: October 22, 2025*
+*Status: Phase 1-9, 13 Complete ✅ | Phase 14 IN PROGRESS ⭐ | Phase 10-12 Pending | DEPLOYED TO AZURE 🚀*

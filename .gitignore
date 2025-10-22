@@ -24,6 +24,12 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Exclude obj and bin folders everywhere
+**/obj/
+**/bin/
+**/Release/
+**/Debug/
+
 # Visual Studio cache/options directory
 .vs/
 
