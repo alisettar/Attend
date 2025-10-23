@@ -42,7 +42,7 @@ _ReSharper*/
 *.DotSettings.user
 
 # SQLite database files
-# *.db
+*.db
 *.db-shm
 *.db-wal
 

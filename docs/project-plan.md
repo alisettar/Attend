@@ -151,17 +151,171 @@
 - ✅ TenantService.ResolveTenantByHash() implementation
 - ✅ Tenant resolution by hash in public endpoints
 
-**Backend (API) - COMPLETED ✅**
+**Backend (API) - 90% COMPLETED ✅**
 - ✅ PublicRegisterCommand (MediatR)
 - ✅ PublicRegisterCommandHandler with scoped tenant service
 - ✅ PublicRegisterCommandValidator (FluentValidation)
-  - ✅ TR phone format validation: `^(\+90|0)?5\d{9}$`
+  - ✅ TR phone format validation: `^(\+90|0)?5\d{9}# Attend - Event Registration System
+## Project Development Plan
+
+### Project Information
+- **Project Location**: `C:\Users\Alisettar\source\repos\Attend\`
+- **Version Control**: Git
+- **Current Status**: Phase 1-9, 13-15 Complete ✅ | Phase 14 MOSTLY DONE 🚀 | DEPLOYED TO AZURE
+- **Database**: SQLite Multi-Tenant (Database per Tenant)
+
+---
+
+## ✅ Completed Features
+
+### Phase 1: Core Foundation - COMPLETED
+- ✅ Clean Architecture structure (Domain, Application, Infrastructure, API, Web)
+- ✅ Domain entities with factory methods
+- ✅ EF Core with SQLite + Configurations
+- ✅ Repository Pattern implementation
+- ✅ Database migrations
+- ✅ Design-time DbContext factory (removed in Phase 5.1)
+
+### Phase 2: Core API - COMPLETED
+- ✅ Carter Minimal API endpoints
+- ✅ CQRS with MediatR (Commands & Queries)
+- ✅ FluentValidation pipeline
+- ✅ Global exception handling
+- ✅ OpenAPI/Swagger documentation
+
+### Phase 3: Web Interface - COMPLETED
+- ✅ ASP.NET Core MVC with dark theme
+- ✅ Controllers: Home, Events, Users, Attendance, Language
+- ✅ HttpClient service layer (EventService, UserService, AttendanceService)
+- ✅ Responsive Bootstrap UI with gradient cards
+- ✅ Multi-language support (TR/EN) with JSON localization
+- ✅ Statistics dashboard
+- ✅ Event cards with date badges
+
+### Phase 4: QR Scanner - COMPLETED
+- ✅ HTML5 QR code scanner (html5-qrcode library)
+- ✅ Camera-based attendance check-in
+- ✅ Real-time success/error feedback
+- ✅ Mobile-responsive scanner interface
+- ✅ Auto QRCode generation for users (USER-{GUID})
+
+### Phase 5: Multi-Tenant Architecture - COMPLETED ✅
+**Architecture Design:**
+- ✅ Multiple SQLite databases (same schema, different data)
+- ✅ Tenant identification via hard-coded username mapping
+- ✅ Dynamic connection string resolution at runtime
+- ✅ Tenant context service (ITenantService, TenantService)
+- ✅ Scoped DbContext per request based on tenant
+
+**Implementation:**
+- ✅ ITenantService interface and TenantService implementation
+- ✅ Tenant configuration in appsettings.json
+- ✅ DbContext registration with dynamic connection string
+- ✅ TenantMiddleware (cookie + header support)
+- ✅ Separate migration/seeding for each tenant database
+- ✅ API Auth endpoints (/api/auth/login, /api/auth/logout)
+- ✅ Cookie-based authentication (API-managed)
+- ✅ Web authentication middleware
+- ✅ Clean Architecture enforcement (Web → API only, no Infrastructure reference)
+- ✅ Cookie forwarding from Web to API
+
+**Phase 5.1: Database Seeding & Search Improvements - COMPLETED ✅**
+- ✅ Tenant-specific seed files (participants_men.json / participants_women.json, events_men.json / events_women.json)
+- ✅ DatabaseSeeder reads tenant from connection string
+- ✅ Removed DefaultConnection fallback (tenant required)
+- ✅ Removed AttendDbContextFactory (no longer needed)
+- ✅ Fixed user seeding with JsonSerializerOptions (PropertyNameCaseInsensitive)
+- ✅ Case-insensitive search (ToUpper for EF Core/SQLite compatibility)
+- ✅ Smart pagination (max 5 pages with ellipsis)
+- ✅ Complete localization for all UI pages
+
+### Phase 6: User Management & QR Generation - COMPLETED ✅
+**Completed:**
+- ✅ User Details page with full information display
+- ✅ User Details page with attendance history table (paginated)
+- ✅ Backend QR code image generation (QRCoder library)
+- ✅ User.QRCodeImage field (base64 PNG storage)
+- ✅ QRCodeService (IQRCodeService interface + implementation)
+- ✅ Automatic QR generation on user creation
+- ✅ QR generation during database seeding
+- ✅ QR code display and download functionality
+- ✅ User list with Details/Edit/Delete actions
+- ✅ Full localization support
+- ✅ Optional fields (Email, Phone) - only Name required
+
+### Phase 7: Event Management - COMPLETED ✅
+**Completed:**
+- ✅ Event Details page with attendee list
+- ✅ Event statistics (Total Registered, Checked In, Cancelled)
+- ✅ Status filtering (All/Registered/CheckedIn/Cancelled)
+- ✅ Pagination UI with smart ellipsis
+- ✅ Full TR/EN localization
+- ✅ Quick Check-in button (→ Scanner page)
+- ✅ Responsive table design with icons
+
+### Phase 8: QR Scanner Revision - COMPLETED ✅
+**Completed:**
+- ✅ Revised Scanner page (ScannerController)
+- ✅ Event selection dropdown (required)
+- ✅ USB Scanner support (keyboard emulation)
+- ✅ Auto-focus + refocus logic (smart focus management)
+- ✅ Camera Scanner integration (html5-qrcode)
+- ✅ Dual mode: USB/Camera toggle
+- ✅ Insert/Update logic (auto-register if not exists)
+- ✅ Duplicate check handling (AlreadyCheckedIn status)
+- ✅ User name + status feedback (3s auto-hide)
+- ✅ Backend: CheckInByQRCodeCommand with EventId
+- ✅ API: CheckInResult response (userName, isNewCheckIn, status)
+- ✅ AttendanceResponse.Status → string conversion
+- ✅ Full localization (30+ new keys)
+- ✅ Navbar and Home page links updated
+
+### Phase 9: Reports Dashboard - COMPLETED ✅
+**Completed:**
+- ✅ Reports Dashboard page (ReportsController)
+- ✅ GetDashboardStatisticsQuery (MediatR)
+- ✅ Dashboard statistics (Total Events, Users, Attendances, Check-ins)
+- ✅ Check-in rate calculation and progress bar
+- ✅ Top 5 Events by check-in count
+- ✅ Top 5 Active Users/Participants by check-in count
+- ✅ ReportService (Web layer)
+- ✅ Gradient stat cards matching Home page design
+- ✅ Full TR/EN localization (10+ new keys)
+- ✅ Navbar Reports link
+
+### Phase 13: Deployment - COMPLETED ✅
+**Priority: High**
+- ✅ Azure App Service configuration (Basic Tier)
+- ✅ Environment variables setup (appsettings.Production.json)
+- ✅ HTTPS enforcement (Azure default)
+- ✅ Production database strategy (SQLite on Azure)
+- ✅ CI/CD pipeline (.github/workflows) - GitHub Actions
+- ✅ Service Principal authentication
+- ✅ CORS configuration for production
+- ✅ Automated deployment on master branch push
+- ✅ Separate API/Web workflows
+
+**Production URLs:**
+- API: https://api-gencligianlamasanati.azurewebsites.net
+- Web: https://gencligianlamasanati.azurewebsites.net
+
+### Phase 14: Public Registration Form - MOSTLY COMPLETED 🚀
+**Priority: HIGH - 90% DONE**
+
+**Tenant Hash System - COMPLETED ✅**
+- ✅ Tenant hash/slug generation (Erkekler: 7k9m2x5w, Kadınlar: 3p8n6r4t)
+- ✅ appsettings.json with tenant hash mappings (Dev + Production)
+- ✅ TenantService.ResolveTenantByHash() implementation
+- ✅ Tenant resolution by hash in public endpoints
+
+
   - ✅ Duplicate phone check (tenant-scoped)
   - ✅ Name validation (required, max 200 chars)
 - ✅ PublicModule: POST /api/public/register/{tenantHash}
 - ✅ Exception handling with user-friendly messages
-- [ ] Rate limiting middleware (IP-based, 5 req/min) - **MISSING**
-- [ ] Google reCAPTCHA v3 backend verification - **MISSING**
+- ✅ ReCaptchaService.cs implementation (Infrastructure layer)
+- ❌ Rate limiting middleware (IP-based, 5 req/min) - **NOT IMPLEMENTED**
+- ⚠️ Google reCAPTCHA v3 backend verification - **IMPLEMENTED BUT NOT ENFORCED** (token optional in command handler)
 
 **Frontend (Web) - COMPLETED ✅**
 - ✅ RegisterController (GET/POST actions)
@@ -185,8 +339,9 @@
 
 **Security & Compliance:**
 - ✅ Google reCAPTCHA v3 frontend integration (token generation)
-- [ ] Google reCAPTCHA v3 backend verification - **MISSING**
-- [ ] Rate limiting configuration - **MISSING**
+- ✅ ReCaptchaService backend implementation (Infrastructure/Services/ReCaptchaService.cs)
+- ⚠️ Google reCAPTCHA v3 backend verification - **OPTIONAL (not mandatory in command handler)**
+- ❌ Rate limiting configuration - **NOT IMPLEMENTED**
 - ✅ CSRF token validation (AntiForgeryToken)
 - ✅ Input sanitization (FluentValidation)
 - ✅ KVKK compliance text
@@ -199,11 +354,11 @@
 - [ ] reCAPTCHA integration test - **TODO**
 
 **Remaining Work:**
-1. Backend reCAPTCHA token verification
-2. Rate limiting middleware (IP-based)
-3. QR code PNG download button on success page
-4. Unit & integration tests
-5. Localization keys validation (TR/EN)
+1. ⚠️ Enforce reCAPTCHA token verification (currently optional)
+2. ❌ Rate limiting middleware (IP-based, 5 req/min) - **CRITICAL**
+3. ❌ QR code PNG download button on success page
+4. ❌ Unit & integration tests
+5. ❌ Localization keys validation (TR/EN)
 
 **Public Registration URL Format:**
 - Erkekler (Men): https://gencligianlamasanati.azurewebsites.net/register/7k9m2x5w
@@ -248,9 +403,9 @@
 ## 🚧 Pending Features
 
 ### Phase 14: Final Touches - IN PROGRESS ⭐
-**Remaining Items:**
-- [ ] Backend reCAPTCHA v3 token verification (verify with Google API)
-- [ ] Rate limiting middleware (IP-based, 5 req/min)
+**Remaining Items (10%):**
+- [ ] **CRITICAL:** Rate limiting middleware (IP-based, 5 req/min) for spam protection
+- [ ] Enforce mandatory reCAPTCHA token verification (currently optional)
 - [ ] QR code PNG download button on Success page
 - [ ] Unit tests for PublicRegisterCommandValidator
 - [ ] Integration tests for duplicate phone check
@@ -494,5 +649,5 @@ Attendances
 
 ---
 
-*Last Updated: October 23, 2025*
-*Status: Phase 1-9, 13, 15 Complete ✅ | Phase 14: 90% Done 🚀 | Phase 10-12 Pending | DEPLOYED TO AZURE 🚀*
+*Last Updated: October 23, 2025 - 12:00*
+*Status: Phase 1-9, 13, 15 Complete ✅ | Phase 14: 90% Done 🚀 (Rate limiting missing) | Phase 10-12 Pending | DEPLOYED TO AZURE 🚀*
