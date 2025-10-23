@@ -27,12 +27,12 @@ az ad sp create-for-rbac --name "attend-github-deploy" --role contributor --scop
 
 ## API Environment Variables
 ```powershell
-az webapp config appsettings set --name api-gencligianlamasanati --resource-group attend-rg --settings TenantSettings__Tenant1__Name="Erkekler" TenantSettings__Tenant1__Hash="abc123xyz" TenantSettings__Tenant1__ConnectionString="Data Source=/home/site/wwwroot/AttendDb_Erkekler.db" TenantSettings__Tenant2__Name="Kadinlar" TenantSettings__Tenant2__Hash="def456uvw" TenantSettings__Tenant2__ConnectionString="Data Source=/home/site/wwwroot/AttendDb_Kadinlar.db"
+az webapp config appsettings set --name api-gencligianlamasanati --resource-group attend-rg --settings GoogleReCaptcha__SiteKey="6LcjWvQrAAAAAEy-FIdSFYhvgsNxI3kzBIm7hew5" GoogleReCaptcha__SecretKey="6LcjWvQrAAAAALeBcKXjw13PoD8-F5mERw8SBj8w" TenantSettings__Tenant1__Name="Erkekler" TenantSettings__Tenant1__Hash="abc123xyz" TenantSettings__Tenant1__ConnectionString="Data Source=/home/site/wwwroot/AttendDb_Erkekler.db" TenantSettings__Tenant2__Name="Kadinlar" TenantSettings__Tenant2__Hash="def456uvw" TenantSettings__Tenant2__ConnectionString="Data Source=/home/site/wwwroot/AttendDb_Kadinlar.db"
 ```
 
 ## Web Environment Variables
 ```powershell
-az webapp config appsettings set --name gencligianlamasanati --resource-group attend-rg --settings ApiSettings__BaseUrl="https://api-gencligianlamasanati.azurewebsites.net/" GoogleReCaptcha__SiteKey="YOUR_SITE_KEY" GoogleReCaptcha__SecretKey="YOUR_SECRET_KEY" BrandingSettings__AppName="Gençliği Anlama Sanatı" BrandingSettings__CompanyName="Gençliği Anlama Sanatı" BrandingSettings__ContactEmailUser="gencligianlamasanati" BrandingSettings__ContactEmailDomain="outlook.com" BrandingSettings__PrimaryColor="#667eea" BrandingSettings__SecondaryColor="#764ba2"
+az webapp config appsettings set --name gencligianlamasanati --resource-group attend-rg --settings ApiSettings__BaseUrl="https://api-gencligianlamasanati.azurewebsites.net/" GoogleReCaptcha__SiteKey="6LcjWvQrAAAAAEy-FIdSFYhvgsNxI3kzBIm7hew5" GoogleReCaptcha__SecretKey="6LcjWvQrAAAAALeBcKXjw13PoD8-F5mERw8SBj8w" BrandingSettings__AppName="Gençliği Anlama Sanatı" BrandingSettings__CompanyName="Gençliği Anlama Sanatı" BrandingSettings__ContactEmailUser="gencligianlamasanati" BrandingSettings__ContactEmailDomain="outlook.com" BrandingSettings__PrimaryColor="#667eea" BrandingSettings__SecondaryColor="#764ba2"
 ```
 
 ## CORS
