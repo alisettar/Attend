@@ -65,4 +65,19 @@ public class TenantService : ITenantService
         }
         return null;
     }
+
+    public string? ResolveTenantByHash(string hash)
+    {
+        foreach (var (tenantId, config) in _tenantsConfig.Tenants)
+        {
+            if (config.Hash.Equals(hash, StringComparison.OrdinalIgnoreCase))
+            {
+                _logger.LogInformation("Resolved tenant '{TenantId}' from hash '{Hash}'", tenantId, hash);
+                return tenantId;
+            }
+        }
+        
+        _logger.LogWarning("No tenant found for hash '{Hash}'", hash);
+        return null;
+    }
 }

@@ -29,6 +29,14 @@ public class UserRepository(AttendDbContext context) : IUserRepository
         return await query.AnyAsync(cancellationToken);
     }
 
+    public async Task<bool> ExistsByPhoneAsync(string phone, Guid? excludeUserId = null, CancellationToken cancellationToken = default)
+    {
+        var query = context.Users.Where(u => u.Phone == phone);
+        if (excludeUserId.HasValue)
+            query = query.Where(u => u.Id != excludeUserId.Value);
+        return await query.AnyAsync(cancellationToken);
+    }
+
     public async Task<List<User>> GetAllAsync(CancellationToken cancellationToken)
         => await context.Users
             .OrderBy(u => u.Name)

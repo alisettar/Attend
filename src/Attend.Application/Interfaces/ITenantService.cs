@@ -9,4 +9,5 @@ public interface ITenantService
     string GetConnectionString();
     TenantConfiguration? GetTenantConfiguration();
     string? ResolveTenantByUsername(string username);
+    string? ResolveTenantByHash(string hash);
 }

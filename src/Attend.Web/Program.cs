@@ -3,6 +3,7 @@ using Attend.Web.Services.Interfaces;
 using Attend.Web.Localization;
 using Attend.Web.Handlers;
 using Attend.Web.Middleware;
+using Attend.Web.Models;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
@@ -40,6 +41,9 @@ builder.Services.AddHttpClient("AttendApi", client =>
     client.Timeout = TimeSpan.FromSeconds(30);
 }).AddHttpMessageHandler<CookieForwardHandler>();
 
+// Branding configuration
+builder.Services.Configure<BrandingSettings>(builder.Configuration.GetSection("BrandingSettings"));
+
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
@@ -56,6 +60,9 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRequestLocalization();
+
+// Rate limiting for public endpoints
+app.UseMiddleware<RateLimitMiddleware>();
 
 // Authentication middleware
 app.UseMiddleware<AuthenticationMiddleware>();

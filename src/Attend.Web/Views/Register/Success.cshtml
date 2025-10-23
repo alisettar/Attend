@@ -1,0 +1,167 @@
+@using Microsoft.Extensions.Options
+@using Attend.Web.Models
+@inject IOptions<BrandingSettings> BrandingOptions
+@{
+    ViewData["Title"] = "Kayıt Başarılı";
+    Layout = null;
+    var qrCodeImage = ViewBag.QRCodeImage as string;
+    var userName = ViewBag.UserName as string;
+    var userId = ViewBag.UserId as Guid?;
+    var branding = BrandingOptions.Value;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @branding.AppName</title>
+    <link rel="icon" type="image/svg+xml" href="@branding.FaviconUrl" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+    <style>
+        :root {
+            --primary-color: @branding.PrimaryColor;
+            --secondary-color: @branding.SecondaryColor;
+        }
+        body {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        .success-card {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+            color: white;
+            animation: scaleIn 0.5s ease-out;
+        }
+        @@keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+        .qr-container {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        .qr-code {
+            max-width: 250px;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+        }
+        .btn {
+            min-height: 50px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+        }
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .company-name {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-card">
+            <div class="success-icon">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            
+            <h2 class="mb-3">Kayıt Başarılı!</h2>
+            <p class="text-muted mb-4">Hoş geldiniz, <strong>@userName</strong>!</p>
+            
+            <div class="qr-container">
+                <p class="fw-semibold mb-3">QR Kodunuz</p>
+                @if (!string.IsNullOrEmpty(qrCodeImage))
+                {
+                    <img src="data:image/png;base64,@qrCodeImage" 
+                         alt="QR Code" 
+                         class="qr-code"
+                         id="qrImage" />
+                }
+                <p class="text-muted small mt-3">
+                    Bu QR kodu etkinliklere katılırken kullanabilirsiniz
+                </p>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button class="btn btn-primary" onclick="downloadQR()">
+                    <i class="bi bi-download"></i> QR Kodu İndir
+                </button>
+                <button class="btn btn-outline-primary" onclick="shareQR()" id="shareBtn" style="display:none;">
+                    <i class="bi bi-share-fill"></i> Paylaş
+                </button>
+            </div>
+            
+            <p class="company-name">@branding.CompanyName</p>
+        </div>
+    </div>
+
+    <script>
+        // Check if Share API is available (mobile devices)
+        if (navigator.share) {
+            document.getElementById('shareBtn').style.display = 'block';
+        }
+
+        function downloadQR() {
+            const qrImage = document.getElementById('qrImage');
+            const link = document.createElement('a');
+            link.download = 'qr-kod-@(userId).png';
+            link.href = qrImage.src;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        async function shareQR() {
+            try {
+                const qrImage = document.getElementById('qrImage');
+                const response = await fetch(qrImage.src);
+                const blob = await response.blob();
+                const file = new File([blob], 'qr-kod.png', { type: 'image/png' });
+                
+                await navigator.share({
+                    title: 'Etkinlik QR Kodum',
+                    text: 'Etkinliklere katılım QR kodum',
+                    files: [file]
+                });
+            } catch (err) {
+                console.log('Share failed:', err);
+            }
+        }
+    </script>
+</body>
+</html>
