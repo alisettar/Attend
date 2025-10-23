@@ -10,11 +10,11 @@ public class CookieForwardHandler : DelegatingHandler
     }
 
     protected override async Task<HttpResponseMessage> SendAsync(
-        HttpRequestMessage request, 
+        HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
-        
+
         if (cookies != null)
         {
             var cookieHeader = string.Join("; ", cookies.Select(c => $"{c.Key}={c.Value}"));

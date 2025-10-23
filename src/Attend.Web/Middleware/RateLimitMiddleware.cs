@@ -22,7 +22,7 @@ public class RateLimitMiddleware
         if (isRegisterPath && context.Request.Method == "POST")
         {
             var ipAddress = context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-            
+
             var now = DateTime.UtcNow;
             var info = _ipRequests.GetOrAdd(ipAddress, _ => new RateLimitInfo());
 

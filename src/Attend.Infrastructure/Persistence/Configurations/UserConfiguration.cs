@@ -1,6 +1,6 @@
+using Attend.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Attend.Domain.Entities;
 
 namespace Attend.Infrastructure.Persistence.Configurations;
 
@@ -20,6 +20,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.Email);
 
         builder.Property(u => u.Phone)
+            .IsRequired()
             .HasMaxLength(50);
 
         builder.Property(u => u.QRCode)

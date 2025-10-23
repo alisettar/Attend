@@ -54,6 +54,10 @@
                         <label class="btn btn-outline-primary" for="cameraMode">
                             <i class="bi bi-camera me-1"></i>@Localizer["CameraScanner"]
                         </label>
+                        <input type="radio" class="btn-check" name="scanMode" id="manualMode">
+                        <label class="btn btn-outline-primary" for="manualMode">
+                            <i class="bi bi-pencil-square me-1"></i>Manuel Kayıt
+                        </label>
                     </div>
                 </div>
             </div>
@@ -105,6 +109,31 @@
                 </div>
             </div>
 
+            <!-- Manual Check-in -->
+            <div class="card mb-4 d-none" id="manualSection">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-pencil-square me-2"></i>Manuel Katılımcı Kaydı
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label">Katılımcı Ara</label>
+                        <input type="text" id="userSearchInput" class="form-control" placeholder="İsim yazarak ara..." />
+                        <select id="userSelect" class="form-select form-select-lg mt-2" size="8">
+                            <option value="">-- Yukarıda arama yapın --</option>
+                        </select>
+                    </div>
+                    <button id="manualCheckInBtn" class="btn btn-primary btn-lg w-100">
+                        <i class="bi bi-check-circle me-1"></i>Katılımcıyı Kaydet
+                    </button>
+                    <div class="text-muted small mt-3">
+                        <i class="bi bi-info-circle me-1"></i>
+                        QR tarayıcı çalışmıyorsa bu yöntemi kullanabilirsiniz
+                    </div>
+                </div>
+            </div>
+
             <!-- Feedback Area -->
             <div id="feedbackArea"></div>
         </div>
@@ -119,22 +148,39 @@
     const feedbackArea = document.getElementById('feedbackArea');
     const usbSection = document.getElementById('usbSection');
     const cameraSection = document.getElementById('cameraSection');
+    const manualSection = document.getElementById('manualSection');
     const usbMode = document.getElementById('usbMode');
     const cameraMode = document.getElementById('cameraMode');
+    const manualMode = document.getElementById('manualMode');
     const startCamera = document.getElementById('startCamera');
     const stopCamera = document.getElementById('stopCamera');
+    const userSearchInput = document.getElementById('userSearchInput');
+    const userSelect = document.getElementById('userSelect');
+    const manualCheckInBtn = document.getElementById('manualCheckInBtn');
     
     let isProcessing = false;
+    let lastScanTime = 0;
+    const SCAN_COOLDOWN = 2000; // 2 seconds cooldown between scans
     let html5QrcodeScanner = null;
 
     // Auto-focus on load
     qrInput.focus();
+
+    // Load users for manual mode - with search
+    let searchTimeout;
+    userSearchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            loadUsers(this.value);
+        }, 300);
+    });
 
     // Mode switching
     usbMode.addEventListener('change', function() {
         if (this.checked) {
             usbSection.classList.remove('d-none');
             cameraSection.classList.add('d-none');
+            manualSection.classList.add('d-none');
             stopCameraScanner();
             setTimeout(() => qrInput.focus(), 100);
         }
@@ -144,6 +190,16 @@
         if (this.checked) {
             usbSection.classList.add('d-none');
             cameraSection.classList.remove('d-none');
+            manualSection.classList.add('d-none');
+        }
+    });
+
+    manualMode.addEventListener('change', function() {
+        if (this.checked) {
+            usbSection.classList.add('d-none');
+            cameraSection.classList.add('d-none');
+            manualSection.classList.remove('d-none');
+            stopCameraScanner();
         }
     });
 
@@ -180,6 +236,66 @@
         stopCameraScanner();
     });
 
+    // Manual Check-in
+    manualCheckInBtn.addEventListener('click', async function() {
+        const eventId = eventSelect.value;
+        const userId = userSelect.value;
+
+        if (!eventId) {
+            showFeedback('error', '@Localizer["PleaseSelectEvent"]');
+            return;
+        }
+
+        if (!userId) {
+            showFeedback('error', 'Lütfen katılımcı seçin');
+            return;
+        }
+
+        try {
+            // Get user's QR code
+            const userResponse = await fetch(`/Users/GetUserByIdJson?id=${userId}`);
+            if (!userResponse.ok) {
+                showFeedback('error', 'Katılımcı bilgisi alınamadı');
+                return;
+            }
+            
+            const user = await userResponse.json();
+            
+            // Use the same CheckIn endpoint as QR scanner
+            const response = await fetch('/Scanner/CheckIn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    qrCode: user.qrCode,
+                    eventId: eventId
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                let statusText = '';
+                if (result.status === 'AlreadyCheckedIn') {
+                    statusText = '@Localizer["AlreadyCheckedIn"]';
+                } else if (result.isNewCheckIn) {
+                    statusText = '@Localizer["NewRegistration"]';
+                } else {
+                    statusText = '@Localizer["Updated"]';
+                }
+                showFeedback('success', `✓ ${user.name} - ${statusText}`);
+                userSelect.value = '';
+            } else {
+                const errorText = await response.text();
+                const errorMessage = parseErrorMessage(errorText);
+                showFeedback('error', errorMessage);
+            }
+        } catch (error) {
+            showFeedback('error', 'Ağ hatası');
+            console.error('Manual check-in error:', error);
+        }
+    });
+
     function startCameraScanner() {
         const eventId = eventSelect.value;
         if (!eventId) {
@@ -189,36 +305,24 @@
 
         html5QrcodeScanner = new Html5Qrcode("reader");
         const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+        const cameraConfig = { facingMode: "environment" }; // Rear camera
 
-        // Try to get camera list first
-        Html5Qrcode.getCameras().then(cameras => {
-            if (cameras && cameras.length > 0) {
-                // Use rear camera if available, otherwise use first camera
-                const cameraId = cameras.length > 1 ? cameras[1].id : cameras[0].id;
-                
-                html5QrcodeScanner.start(
-                    cameraId,
-                    config,
-                    async (decodedText) => {
-                        if (!isProcessing) {
-                            await processQRCode(decodedText);
-                        }
-                    },
-                    (errorMessage) => {
-                        // Ignore decode errors
-                    }
-                ).then(() => {
-                    startCamera.classList.add('d-none');
-                    stopCamera.classList.remove('d-none');
-                }).catch((err) => {
-                    showFeedback('error', `Kamera başlatılamadı: ${err}`);
-                });
-            } else {
-                showFeedback('error', 'Kamera bulunamadı. USB tarayıcı kullanın.');
+        html5QrcodeScanner.start(
+            cameraConfig,
+            config,
+            async (decodedText) => {
+                if (!isProcessing) {
+                    await processQRCode(decodedText);
+                }
+            },
+            (errorMessage) => {
+                // Ignore decode errors
             }
-        }).catch(err => {
-            showFeedback('error', 'Kameraya erişim izni reddedildi veya kamera bulunamadı. Lütfen USB tarayıcıyı kullanın.');
-            console.error('Camera error:', err);
+        ).then(() => {
+            startCamera.classList.add('d-none');
+            stopCamera.classList.remove('d-none');
+        }).catch((err) => {
+            showFeedback('error', `Kamera başlatılamadı: ${err}`);
         });
     }
 
@@ -234,6 +338,34 @@
         }
     }
 
+    async function loadUsers(searchTerm = '') {
+        if (searchTerm.length < 2) {
+            userSelect.innerHTML = '<option value="">-- En az 2 karakter girin --</option>';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/Users/GetUsersJson?pageSize=50&search=${encodeURIComponent(searchTerm)}`);
+            if (response.ok) {
+                const data = await response.json();
+                userSelect.innerHTML = '';
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(user => {
+                        const option = document.createElement('option');
+                        option.value = user.id;
+                        option.textContent = user.name;
+                        userSelect.appendChild(option);
+                    });
+                } else {
+                    userSelect.innerHTML = '<option value="">Sonuç bulunamadı</option>';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+            userSelect.innerHTML = '<option value="">Hata oluştu</option>';
+        }
+    }
+
     async function processQRCode(qrCode) {
         const eventId = eventSelect.value;
 
@@ -246,7 +378,19 @@
             return;
         }
 
+        // Check cooldown period to prevent duplicate scans
+        const currentTime = Date.now();
+        if (currentTime - lastScanTime < SCAN_COOLDOWN) {
+            if (usbMode.checked) {
+                qrInput.value = '';
+                qrInput.focus();
+            }
+            return;
+        }
+
         isProcessing = true;
+        lastScanTime = currentTime;
+        
         if (usbMode.checked) {
             qrInput.disabled = true;
         }
@@ -277,8 +421,9 @@
 
                 showFeedback('success', `✓ ${result.userName} - ${statusText}`);
             } else {
-                const error = await response.text();
-                showFeedback('error', error || '@Localizer["CheckInFailed"]');
+                const errorText = await response.text();
+                const errorMessage = parseErrorMessage(errorText);
+                showFeedback('error', errorMessage);
             }
         } catch (error) {
             showFeedback('error', '@Localizer["NetworkError"]');
@@ -289,7 +434,20 @@
                 qrInput.disabled = false;
                 qrInput.focus();
             }
-            isProcessing = false;
+            
+            // Reset processing flag after a short delay
+            setTimeout(() => {
+                isProcessing = false;
+            }, 500);
+        }
+    }
+
+    function parseErrorMessage(errorText) {
+        try {
+            const errorObj = JSON.parse(errorText);
+            return errorObj.error || errorText;
+        } catch {
+            return errorText || '@Localizer["CheckInFailed"]';
         }
     }
 

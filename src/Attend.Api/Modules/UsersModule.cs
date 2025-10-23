@@ -1,10 +1,10 @@
+using Attend.Application.Data;
+using Attend.Application.Data.Users.Commands;
+using Attend.Application.Data.Users.Queries;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Attend.Application.Data;
-using Attend.Application.Data.Users.Commands;
-using Attend.Application.Data.Users.Queries;
 
 namespace Attend.Api.Modules;
 
@@ -44,7 +44,7 @@ public class UsersModule : ICarterModule
         HttpContext context)
     {
         var result = await sender.Send(
-            new GetUsersQuery(paginationRequest ?? new()), 
+            new GetUsersQuery(paginationRequest ?? new()),
             context.RequestAborted);
         return TypedResults.Ok(result);
     }

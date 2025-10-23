@@ -1,11 +1,11 @@
-using MediatR;
 using Attend.Application.Repositories;
+using MediatR;
 
 namespace Attend.Application.Data.Users.Queries;
 
 public sealed record GetUserByIdQuery(Guid Id) : IRequest<UserResponse?>;
 
-public sealed class GetUserByIdQueryHandler(IUserRepository repository) 
+public sealed class GetUserByIdQueryHandler(IUserRepository repository)
     : IRequestHandler<GetUserByIdQuery, UserResponse?>
 {
     public async Task<UserResponse?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)

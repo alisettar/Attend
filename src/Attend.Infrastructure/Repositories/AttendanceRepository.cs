@@ -47,8 +47,8 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
             .ToListAsync(cancellationToken);
 
     public async Task<(List<Attendance> items, long totalCount)> GetPaginatedByEventAsync(
-        Guid eventId, 
-        PaginationRequest request, 
+        Guid eventId,
+        PaginationRequest request,
         CancellationToken cancellationToken = default)
     {
         var query = context.Attendances
@@ -59,7 +59,7 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            query = query.Where(a => 
+            query = query.Where(a =>
                 a.User.Name.Contains(request.SearchText) ||
                 (a.User.Email != null && a.User.Email.Contains(request.SearchText)));
         }
@@ -82,8 +82,8 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
     }
 
     public async Task<(List<Attendance> items, long totalCount)> GetPaginatedByUserAsync(
-        Guid userId, 
-        PaginationRequest request, 
+        Guid userId,
+        PaginationRequest request,
         CancellationToken cancellationToken = default)
     {
         var query = context.Attendances
@@ -94,7 +94,7 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            query = query.Where(a => 
+            query = query.Where(a =>
                 a.Event.Title.Contains(request.SearchText) ||
                 (a.Event.Description != null && a.Event.Description.Contains(request.SearchText)));
         }

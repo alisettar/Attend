@@ -1,11 +1,11 @@
-using MediatR;
 using Attend.Application.Repositories;
+using MediatR;
 
 namespace Attend.Application.Data.Attendances.Commands;
 
 public sealed record CancelAttendanceCommand(Guid AttendanceId) : IRequest<bool>;
 
-public sealed class CancelAttendanceCommandHandler(IAttendanceRepository repository) 
+public sealed class CancelAttendanceCommandHandler(IAttendanceRepository repository)
     : IRequestHandler<CancelAttendanceCommand, bool>
 {
     public async Task<bool> Handle(CancelAttendanceCommand request, CancellationToken cancellationToken)

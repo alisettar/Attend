@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using Attend.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Attend.Web.Controllers;
 

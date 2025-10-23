@@ -1,3 +1,4 @@
+using Attend.Web.Extensions;
 using Attend.Web.Models;
 using Attend.Web.Services.Interfaces;
 using System.Text.Json;
@@ -15,37 +16,30 @@ public class EventService(IHttpClientFactory httpClientFactory, ILogger<EventSer
 
     public async Task<PaginatedResponse<EventViewModel>> GetEventsAsync(PaginationRequest request)
     {
-        try
-        {
-            var queryParams = $"?paginationRequest={{\"SearchText\":\"{Uri.EscapeDataString(request.SearchText)}\",\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
-            var response = await _httpClient.GetAsync($"/events{queryParams}");
-            response.EnsureSuccessStatusCode();
-            
-            var json = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiPaginationResponse<EventViewModel>>(json, _jsonOptions)!;
+        var queryParams = $"?paginationRequest={{\"SearchText\":\"{Uri.EscapeDataString(request.SearchText)}\",\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
+        var response = await _httpClient.GetAsync($"/events{queryParams}");
+        var apiResponse = await response.ReadAsJsonOrThrowAsync<ApiPaginationResponse<EventViewModel>>();
 
-            return new PaginatedResponse<EventViewModel>
-            {
-                Items = apiResponse.Items,
-                TotalCount = apiResponse.TotalCount,
-                Page = request.Page + 1,
-                PageSize = request.PageSize
-            };
-        }
-        catch (Exception ex)
+        return new PaginatedResponse<EventViewModel>
         {
-            logger.LogError(ex, "Error getting events");
-            throw new ApplicationException("Failed to get events.");
-        }
+            Items = apiResponse.Items,
+            TotalCount = apiResponse.TotalCount,
+            Page = request.Page + 1,
+            PageSize = request.PageSize
+        };
     }
 
     public async Task<EventViewModel?> GetEventByIdAsync(Guid id)
     {
-        var response = await _httpClient.GetAsync($"/events/{id}");
-        if (!response.IsSuccessStatusCode) return null;
-        
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<EventViewModel>(json, _jsonOptions);
+        try
+        {
+            var response = await _httpClient.GetAsync($"/events/{id}");
+            return await response.ReadAsJsonOrThrowAsync<EventViewModel>();
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return null;
+        }
     }
 
     public async Task<Guid> CreateEventAsync(EventCreateViewModel model)
@@ -53,8 +47,8 @@ public class EventService(IHttpClientFactory httpClientFactory, ILogger<EventSer
         var json = JsonSerializer.Serialize(model, _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("/events", content);
-        response.EnsureSuccessStatusCode();
-        
+        await response.EnsureSuccessOrThrowAsync();
+
         var location = response.Headers.Location?.ToString();
         var idString = location?.Split('/').LastOrDefault();
         return Guid.Parse(idString!);
@@ -62,15 +56,31 @@ public class EventService(IHttpClientFactory httpClientFactory, ILogger<EventSer
 
     public async Task<bool> UpdateEventAsync(Guid id, EventUpdateViewModel model)
     {
-        var json = JsonSerializer.Serialize(model, _jsonOptions);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"/events/{id}", content);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var json = JsonSerializer.Serialize(model, _jsonOptions);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"/events/{id}", content);
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 
     public async Task<bool> DeleteEventAsync(Guid id)
     {
-        var response = await _httpClient.DeleteAsync($"/events/{id}");
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"/events/{id}");
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 }

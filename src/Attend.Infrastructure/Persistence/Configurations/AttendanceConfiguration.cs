@@ -1,7 +1,6 @@
+using Attend.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Attend.Domain.Entities;
-using Attend.Domain.Enums;
 
 namespace Attend.Infrastructure.Persistence.Configurations;
 

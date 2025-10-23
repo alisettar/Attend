@@ -9,7 +9,7 @@ public interface IAttendanceService
     Task<PaginatedResponse<AttendanceViewModel>> GetUserAttendancesAsync(Guid userId, PaginationRequest request);
     Task<Guid> RegisterAttendanceAsync(Guid userId, Guid eventId);
     Task<bool> CheckInAsync(Guid attendanceId);
-    Task<bool> CheckInAsync(Guid eventId, Guid userId); // Overload for QR scanner
+    Task<bool> CheckInAsync(Guid eventId, Guid userId);
     Task<CheckInResultViewModel> CheckInByQRCodeAsync(string qrCode, Guid eventId);
-    Task<bool> CancelAttendanceAsync(Guid attendanceId);
+    Task<bool> DeleteAttendanceAsync(Guid attendanceId);
 }

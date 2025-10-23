@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
 using Attend.Application.Data;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
 using Attend.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attend.Infrastructure.Repositories;
 
@@ -46,7 +46,7 @@ public class UserRepository(AttendDbContext context) : IUserRepository
         => await context.Users.CountAsync(cancellationToken);
 
     public async Task<(List<User> items, long totalCount)> GetPaginatedAsync(
-        PaginationRequest request, 
+        PaginationRequest request,
         CancellationToken cancellationToken = default)
     {
         var query = context.Users.AsNoTracking().AsQueryable();
@@ -54,7 +54,7 @@ public class UserRepository(AttendDbContext context) : IUserRepository
         if (!string.IsNullOrEmpty(request.SearchText))
         {
             var searchUpper = request.SearchText.ToUpper();
-            query = query.Where(u => 
+            query = query.Where(u =>
                 u.Name.ToUpper().Contains(searchUpper) ||
                 (u.Email != null && u.Email.ToUpper().Contains(searchUpper)) ||
                 (u.Phone != null && u.Phone.ToUpper().Contains(searchUpper)));

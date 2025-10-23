@@ -1,13 +1,13 @@
-using MediatR;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
 using FluentValidation;
+using MediatR;
 
 namespace Attend.Application.Data.Events.Commands;
 
 public sealed record UpdateEventCommand(EventRequest Request) : IRequest<bool>;
 
-public sealed class UpdateEventCommandHandler(IEventRepository repository) 
+public sealed class UpdateEventCommandHandler(IEventRepository repository)
     : IRequestHandler<UpdateEventCommand, bool>
 {
     public async Task<bool> Handle(UpdateEventCommand request, CancellationToken cancellationToken)
@@ -35,10 +35,12 @@ public sealed class UpdateEventCommandValidator : AbstractValidator<UpdateEventC
     {
         RuleFor(x => x.Request.Id)
             .NotEmpty()
-            .WithMessage("Event ID cannot be empty.");
+            .WithMessage("Event ID is required.");
 
         RuleFor(x => x.Request.Title)
             .NotEmpty()
-            .WithMessage("Title cannot be empty.");
+            .WithMessage("Title is required.")
+            .MaximumLength(200)
+            .WithMessage("Title must not exceed 200 characters.");
     }
 }

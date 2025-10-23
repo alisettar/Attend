@@ -1,11 +1,11 @@
-using Carter;
-using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using FluentValidation;
 using Attend.Application.Data;
 using Attend.Application.Data.Attendances.Commands;
 using Attend.Application.Data.Attendances.Queries;
+using Carter;
+using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Attend.Api.Modules;
 
@@ -19,7 +19,7 @@ public class AttendancesModule : ICarterModule
         app.MapPost("/events/{eventId}/register", RegisterAttendance);
         app.MapPost("/attendances/{id}/checkin", CheckIn);
         app.MapPost("/checkin/qrcode", CheckInByQRCode);
-        app.MapDelete("/attendances/{id}", CancelAttendance);
+        app.MapDelete("/attendances/{id}", DeleteAttendance);
     }
 
     private static async Task<Results<Ok<AttendanceResponse>, NotFound>> GetAttendanceById(
@@ -38,7 +38,7 @@ public class AttendancesModule : ICarterModule
         HttpContext context)
     {
         var result = await sender.Send(
-            new GetAttendancesByEventQuery(eventId, paginationRequest ?? new()), 
+            new GetAttendancesByEventQuery(eventId, paginationRequest ?? new()),
             context.RequestAborted);
         return TypedResults.Ok(result);
     }
@@ -50,7 +50,7 @@ public class AttendancesModule : ICarterModule
         HttpContext context)
     {
         var result = await sender.Send(
-            new GetUserAttendancesQuery(userId, paginationRequest ?? new()), 
+            new GetUserAttendancesQuery(userId, paginationRequest ?? new()),
             context.RequestAborted);
         return TypedResults.Ok(result);
     }
@@ -83,7 +83,7 @@ public class AttendancesModule : ICarterModule
         try
         {
             var result = await sender.Send(
-                new CheckInByQRCodeCommand(request.QRCode, request.EventId), 
+                new CheckInByQRCodeCommand(request.QRCode, request.EventId),
                 context.RequestAborted);
             return TypedResults.Ok(result);
         }
@@ -93,12 +93,12 @@ public class AttendancesModule : ICarterModule
         }
     }
 
-    private static async Task<Results<NoContent, NotFound>> CancelAttendance(
+    private static async Task<Results<NoContent, NotFound>> DeleteAttendance(
         Guid id,
         [FromServices] ISender sender,
         HttpContext context)
     {
-        var result = await sender.Send(new CancelAttendanceCommand(id), context.RequestAborted);
+        var result = await sender.Send(new DeleteAttendanceCommand(id), context.RequestAborted);
         return result ? TypedResults.NoContent() : TypedResults.NotFound();
     }
 }

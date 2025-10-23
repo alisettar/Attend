@@ -9,9 +9,11 @@
 <h2>@Localizer["CreateUser"]</h2>
 
 <form asp-action="Create" method="post" class="mt-4">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    
     <div class="mb-3">
-        <label asp-for="Name" class="form-label">@Localizer["Name"]</label>
-        <input asp-for="Name" class="form-control" placeholder="@Localizer["EnterName"]" />
+        <label asp-for="Name" class="form-label">@Localizer["Name"] <span class="text-danger">*</span></label>
+        <input asp-for="Name" class="form-control" placeholder="@Localizer["EnterName"]" required />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
     
@@ -22,9 +24,16 @@
     </div>
     
     <div class="mb-3">
-        <label asp-for="Phone" class="form-label">@Localizer["Phone"]</label>
-        <input asp-for="Phone" class="form-control" placeholder="@Localizer["EnterPhone"]" />
+        <label asp-for="Phone" class="form-label">@Localizer["Phone"] <span class="text-danger">*</span></label>
+        <input asp-for="Phone" 
+               type="tel" 
+               class="form-control" 
+               id="phoneInput"
+               placeholder="05XX XXX XX XX" 
+               maxlength="14"
+               required />
         <span asp-validation-for="Phone" class="text-danger"></span>
+        <small class="text-muted">Format: 05XX XXX XX XX</small>
     </div>
 
     @if (ViewBag.Error != null)
@@ -37,3 +46,52 @@
         <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
     </div>
 </form>
+
+@section Scripts {
+<script>
+    const phoneInput = document.getElementById('phoneInput');
+    
+    phoneInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        // Auto-add 0 if not present
+        if (value.length > 0 && value[0] !== '0') {
+            value = '0' + value;
+        }
+        
+        // Limit to 11 digits
+        if (value.length > 11) {
+            value = value.substring(0, 11);
+        }
+        
+        // Format: 0XXX XXX XX XX
+        let formatted = '';
+        for (let i = 0; i < value.length; i++) {
+            formatted += value[i];
+            if (i === 3 || i === 6 || i === 8) {
+                formatted += ' ';
+            }
+        }
+        
+        e.target.value = formatted;
+    });
+    
+    phoneInput.addEventListener('keydown', function(e) {
+        // Allow: backspace, delete, tab, escape, enter
+        if ([46, 8, 9, 27, 13].indexOf(e.keyCode) !== -1 ||
+            // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+            (e.keyCode === 65 && e.ctrlKey === true) ||
+            (e.keyCode === 67 && e.ctrlKey === true) ||
+            (e.keyCode === 86 && e.ctrlKey === true) ||
+            (e.keyCode === 88 && e.ctrlKey === true) ||
+            // Allow: home, end, left, right
+            (e.keyCode >= 35 && e.keyCode <= 39)) {
+            return;
+        }
+        // Ensure that it is a number
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+</script>
+}

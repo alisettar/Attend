@@ -1,9 +1,9 @@
-using Attend.Web.Services;
-using Attend.Web.Services.Interfaces;
-using Attend.Web.Localization;
 using Attend.Web.Handlers;
+using Attend.Web.Localization;
 using Attend.Web.Middleware;
 using Attend.Web.Models;
+using Attend.Web.Services;
+using Attend.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
@@ -23,7 +23,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         new CultureInfo("tr"),
         new CultureInfo("en")
     };
-    
+
     options.DefaultRequestCulture = new RequestCulture("tr");
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;

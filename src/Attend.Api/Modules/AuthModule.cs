@@ -1,5 +1,5 @@
-using Carter;
 using Attend.Application.Interfaces;
+using Carter;
 
 namespace Attend.Api.Modules;
 
@@ -19,7 +19,7 @@ public class AuthModule : ICarterModule
             return Results.BadRequest(new { error = "Username is required" });
 
         var tenantId = tenantService.ResolveTenantByUsername(request.Username);
-        
+
         if (tenantId == null)
             return Results.NotFound(new { error = "User not found" });
 
@@ -42,6 +42,7 @@ public class AuthModule : ICarterModule
             Path = "/"
         });
 
+        await Task.CompletedTask;
         return Results.Ok(new { username = request.Username, tenantId });
     }
 

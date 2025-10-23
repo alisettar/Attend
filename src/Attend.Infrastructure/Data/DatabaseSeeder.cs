@@ -10,22 +10,33 @@ public static class DatabaseSeeder
 {
     public static async Task SeedAsync(AttendDbContext context)
     {
+        // Ensure database and tables are created first
+        await context.Database.EnsureCreatedAsync();
+
         await SeedUsersAsync(context);
         await SeedEventsAsync(context);
     }
 
     private static async Task SeedUsersAsync(AttendDbContext context)
     {
-        if (await context.Users.AnyAsync())
-            return;
+        // Check if table exists first
+        try
+        {
+            if (await context.Users.AnyAsync())
+                return;
+        }
+        catch
+        {
+            // Table doesn't exist yet, continue with seeding
+        }
 
         var connectionString = context.Database.GetConnectionString();
-        var fileName = connectionString?.Contains("Erkekler") == true 
-            ? @"Data/participants_men.json" 
+        var fileName = connectionString?.Contains("Erkekler") == true
+            ? @"Data/participants_men.json"
             : @"Data/participants_women.json";
-        
+
         var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        
+
         if (!File.Exists(jsonPath))
             return;
 
@@ -37,13 +48,15 @@ public static class DatabaseSeeder
             return;
 
         var qrService = new QRCodeService();
-        var users = data.Names.Select(name => 
+        var users = data.Names.Select((name, index) =>
         {
-            var user = User.Create(name);
+            // Generate unique dummy phone for seeding: 05000000001, 05000000002, etc.
+            var phone = $"05{(index + 1):D9}";
+            var user = User.Create(name, phone);
             user.QRCodeImage = qrService.GenerateQRCodeImage(user.QRCode);
             return user;
         }).ToList();
-        
+
         await context.Users.AddRangeAsync(users);
         await context.SaveChangesAsync();
 
@@ -52,16 +65,24 @@ public static class DatabaseSeeder
 
     private static async Task SeedEventsAsync(AttendDbContext context)
     {
-        if (await context.Events.AnyAsync())
-            return;
+        // Check if table exists first
+        try
+        {
+            if (await context.Events.AnyAsync())
+                return;
+        }
+        catch
+        {
+            // Table doesn't exist yet, continue with seeding
+        }
 
         var connectionString = context.Database.GetConnectionString();
-        var fileName = connectionString?.Contains("Erkekler") == true 
+        var fileName = connectionString?.Contains("Erkekler") == true
             ? @"Data/events_men.json"
             : @"Data/events_women.json";
-        
+
         var jsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName);
-        
+
         if (!File.Exists(jsonPath))
             return;
 

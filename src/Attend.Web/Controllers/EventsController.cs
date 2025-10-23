@@ -1,17 +1,30 @@
-using Microsoft.AspNetCore.Mvc;
+using Attend.Web.Exceptions;
 using Attend.Web.Models;
 using Attend.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 
 namespace Attend.Web.Controllers;
 
-public class EventsController(IEventService eventService, IAttendanceService attendanceService) : Controller
+public class EventsController(
+    IEventService eventService,
+    IAttendanceService attendanceService,
+    IStringLocalizer<SharedResource> localizer) : Controller
 {
     public async Task<IActionResult> Index(int page = 1, string search = "")
     {
-        ViewBag.SearchTerm = search;
-        var request = new PaginationRequest(page - 1, 10, search);
-        var events = await eventService.GetEventsAsync(request);
-        return View(events);
+        try
+        {
+            ViewBag.SearchTerm = search;
+            var request = new PaginationRequest(page - 1, 10, search);
+            var events = await eventService.GetEventsAsync(request);
+            return View(events);
+        }
+        catch (ApiException ex)
+        {
+            ViewBag.Error = ex.Message;
+            return View(new PaginatedResponse<EventViewModel> { Items = [], TotalCount = 0 });
+        }
     }
 
     public IActionResult Create()
@@ -28,30 +41,43 @@ public class EventsController(IEventService eventService, IAttendanceService att
         try
         {
             await eventService.CreateEventAsync(model);
-            TempData["Success"] = "Event created successfully.";
+            TempData["Success"] = localizer["EventCreatedSuccessfully"].Value;
             return RedirectToAction(nameof(Index));
         }
-        catch (Exception ex)
+        catch (ValidationApiException vex)
         {
-            ViewBag.Error = $"Error: {ex.Message}";
+            ModelState.AddModelError("", vex.Message);
+            return View(model);
+        }
+        catch (ApiException ex)
+        {
+            ViewBag.Error = ex.Message;
             return View(model);
         }
     }
 
     public async Task<IActionResult> Edit(Guid id)
     {
-        var @event = await eventService.GetEventByIdAsync(id);
-        if (@event == null)
-            return NotFound();
-
-        var model = new EventUpdateViewModel
+        try
         {
-            Title = @event.Title,
-            Description = @event.Description,
-            Date = @event.Date
-        };
-        
-        return View(model);
+            var @event = await eventService.GetEventByIdAsync(id);
+            if (@event == null)
+                return NotFound();
+
+            var model = new EventUpdateViewModel
+            {
+                Title = @event.Title,
+                Description = @event.Description,
+                Date = @event.Date
+            };
+
+            return View(model);
+        }
+        catch (ApiException ex)
+        {
+            TempData["Error"] = ex.Message;
+            return RedirectToAction(nameof(Index));
+        }
     }
 
     [HttpPost]
@@ -65,48 +91,60 @@ public class EventsController(IEventService eventService, IAttendanceService att
             var success = await eventService.UpdateEventAsync(id, model);
             if (success)
             {
-                TempData["Success"] = "Event updated successfully.";
+                TempData["Success"] = localizer["EventUpdatedSuccessfully"].Value;
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                ViewBag.Error = "Event not found.";
+                ViewBag.Error = localizer["EventNotFound"].Value;
+                return View(model);
             }
         }
-        catch (Exception ex)
+        catch (ValidationApiException vex)
         {
-            ViewBag.Error = $"Error: {ex.Message}";
+            ModelState.AddModelError("", vex.Message);
+            return View(model);
         }
-
-        return View(model);
+        catch (ApiException ex)
+        {
+            ViewBag.Error = ex.Message;
+            return View(model);
+        }
     }
 
     public async Task<IActionResult> Details(Guid id, int page = 1, string status = "")
     {
-        var @event = await eventService.GetEventByIdAsync(id);
-        if (@event == null)
-            return NotFound();
-
-        ViewBag.Event = @event;
-        ViewBag.StatusFilter = status;
-        
-        var request = new PaginationRequest(page - 1, 10);
-        var attendees = await attendanceService.GetEventAttendeesAsync(id, request);
-        
-        // Client-side filtering for now
-        if (!string.IsNullOrEmpty(status))
+        try
         {
-            var filteredItems = attendees.Items.Where(a => a.Status == status).ToList();
-            attendees = new PaginatedResponse<AttendanceViewModel>
+            var @event = await eventService.GetEventByIdAsync(id);
+            if (@event == null)
+                return NotFound();
+
+            ViewBag.Event = @event;
+            ViewBag.StatusFilter = status;
+
+            var request = new PaginationRequest(page - 1, 10);
+            var attendees = await attendanceService.GetEventAttendeesAsync(id, request);
+
+            if (!string.IsNullOrEmpty(status))
             {
-                Items = filteredItems,
-                TotalCount = filteredItems.Count,
-                Page = attendees.Page,
-                PageSize = attendees.PageSize
-            };
+                var filteredItems = attendees.Items.Where(a => a.Status == status).ToList();
+                attendees = new PaginatedResponse<AttendanceViewModel>
+                {
+                    Items = filteredItems,
+                    TotalCount = filteredItems.Count,
+                    Page = attendees.Page,
+                    PageSize = attendees.PageSize
+                };
+            }
+
+            return View(attendees);
         }
-        
-        return View(attendees);
+        catch (ApiException ex)
+        {
+            ViewBag.Error = ex.Message;
+            return NotFound();
+        }
     }
 
     [HttpPost]
@@ -116,13 +154,13 @@ public class EventsController(IEventService eventService, IAttendanceService att
         {
             var success = await eventService.DeleteEventAsync(id);
             if (success)
-                TempData["Success"] = "Event deleted successfully.";
+                TempData["Success"] = localizer["EventDeletedSuccessfully"].Value;
             else
-                TempData["Error"] = "Event could not be deleted.";
+                TempData["Error"] = localizer["EventCouldNotBeDeleted"].Value;
         }
-        catch (Exception ex)
+        catch (ApiException ex)
         {
-            TempData["Error"] = $"Error: {ex.Message}";
+            TempData["Error"] = ex.Message;
         }
 
         return RedirectToAction(nameof(Index));

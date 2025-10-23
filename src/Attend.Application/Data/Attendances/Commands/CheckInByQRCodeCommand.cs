@@ -1,7 +1,7 @@
-using MediatR;
 using Attend.Application.Repositories;
-using FluentValidation;
 using Attend.Domain.Entities;
+using FluentValidation;
+using MediatR;
 
 namespace Attend.Application.Data.Attendances.Commands;
 
@@ -15,20 +15,18 @@ public sealed record CheckInResult(
 public sealed class CheckInByQRCodeCommandHandler(
     IUserRepository userRepository,
     IEventRepository eventRepository,
-    IAttendanceRepository attendanceRepository) 
+    IAttendanceRepository attendanceRepository)
     : IRequestHandler<CheckInByQRCodeCommand, CheckInResult>
 {
     public async Task<CheckInResult> Handle(CheckInByQRCodeCommand request, CancellationToken cancellationToken)
     {
         // Get user by QR code
-        var user = await userRepository.GetByQRCodeAsync(request.QRCode, cancellationToken);
-        if (user == null)
-            throw new ValidationException("Invalid QR code.");
+        var user = await userRepository.GetByQRCodeAsync(request.QRCode, cancellationToken) 
+            ?? throw new ValidationException("Invalid QR code.");
 
         // Verify event exists
-        var evt = await eventRepository.GetByIdAsync(request.EventId, cancellationToken);
-        if (evt == null)
-            throw new ValidationException("Event not found.");
+        _ = await eventRepository.GetByIdAsync(request.EventId, cancellationToken)
+            ?? throw new ValidationException("Event not found.");
 
         // Check if attendance exists
         var attendance = await attendanceRepository.GetByUserAndEventAsync(user.Id, request.EventId, cancellationToken);
@@ -66,7 +64,7 @@ public sealed class CheckInByQRCodeCommandValidator : AbstractValidator<CheckInB
         RuleFor(x => x.QRCode)
             .NotEmpty()
             .WithMessage("QR code cannot be empty.");
-        
+
         RuleFor(x => x.EventId)
             .NotEmpty()
             .WithMessage("Event ID is required.");

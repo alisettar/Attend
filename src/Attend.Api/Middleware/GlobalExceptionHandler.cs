@@ -25,13 +25,30 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IE
         {
             problemDetails.Status = StatusCodes.Status400BadRequest;
             problemDetails.Title = "Validation error";
-            problemDetails.Detail = validationException.Message;
-            
+
+            // Extract clean error messages
             if (validationException.Errors?.Any() == true)
             {
+                var errorMessages = validationException.Errors
+                    .Select(e => e.ErrorMessage)
+                    .Where(msg => !string.IsNullOrWhiteSpace(msg))
+                    .ToList();
+
+                // Use first error message as detail (user-friendly)
+                problemDetails.Detail = errorMessages.FirstOrDefault() ?? validationException.Message;
+
+                // Add all errors to extensions for API consumers
                 var errors = validationException.Errors
-                    .Select(e => new { e.PropertyName, e.ErrorMessage, e.Severity });
-                problemDetails.Extensions.Add("Errors", errors);
+                    .Select(e => new
+                    {
+                        Field = e.PropertyName.Replace("Request.", "").Replace(".", ""),
+                        Message = e.ErrorMessage
+                    });
+                problemDetails.Extensions.Add("errors", errors);
+            }
+            else
+            {
+                problemDetails.Detail = validationException.Message;
             }
         }
 

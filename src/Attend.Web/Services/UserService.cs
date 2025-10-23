@@ -1,3 +1,4 @@
+using Attend.Web.Extensions;
 using Attend.Web.Models;
 using Attend.Web.Services.Interfaces;
 using System.Text.Json;
@@ -15,46 +16,43 @@ public class UserService(IHttpClientFactory httpClientFactory, ILogger<UserServi
 
     public async Task<PaginatedResponse<UserViewModel>> GetUsersAsync(PaginationRequest request)
     {
-        try
-        {
-            var queryParams = $"?paginationRequest={{\"SearchText\":\"{Uri.EscapeDataString(request.SearchText)}\",\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
-            var response = await _httpClient.GetAsync($"/users{queryParams}");
-            response.EnsureSuccessStatusCode();
-            
-            var json = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiPaginationResponse<UserViewModel>>(json, _jsonOptions)!;
+        var queryParams = $"?paginationRequest={{\"SearchText\":\"{Uri.EscapeDataString(request.SearchText)}\",\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
+        var response = await _httpClient.GetAsync($"/users{queryParams}");
+        var apiResponse = await response.ReadAsJsonOrThrowAsync<ApiPaginationResponse<UserViewModel>>();
 
-            return new PaginatedResponse<UserViewModel>
-            {
-                Items = apiResponse.Items,
-                TotalCount = apiResponse.TotalCount,
-                Page = request.Page + 1,
-                PageSize = request.PageSize
-            };
-        }
-        catch (Exception ex)
+        return new PaginatedResponse<UserViewModel>
         {
-            logger.LogError(ex, "Error getting users");
-            throw new ApplicationException("Failed to get users.");
-        }
+            Items = apiResponse.Items,
+            TotalCount = apiResponse.TotalCount,
+            Page = request.Page + 1,
+            PageSize = request.PageSize
+        };
     }
 
     public async Task<UserViewModel?> GetUserByIdAsync(Guid id)
     {
-        var response = await _httpClient.GetAsync($"/users/{id}");
-        if (!response.IsSuccessStatusCode) return null;
-        
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<UserViewModel>(json, _jsonOptions);
+        try
+        {
+            var response = await _httpClient.GetAsync($"/users/{id}");
+            return await response.ReadAsJsonOrThrowAsync<UserViewModel>();
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return null;
+        }
     }
 
     public async Task<UserViewModel?> GetUserByQRCodeAsync(string qrCode)
     {
-        var response = await _httpClient.GetAsync($"/users/qrcode/{Uri.EscapeDataString(qrCode)}");
-        if (!response.IsSuccessStatusCode) return null;
-        
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<UserViewModel>(json, _jsonOptions);
+        try
+        {
+            var response = await _httpClient.GetAsync($"/users/qrcode/{Uri.EscapeDataString(qrCode)}");
+            return await response.ReadAsJsonOrThrowAsync<UserViewModel>();
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return null;
+        }
     }
 
     public async Task<Guid> CreateUserAsync(UserCreateViewModel model)
@@ -62,8 +60,8 @@ public class UserService(IHttpClientFactory httpClientFactory, ILogger<UserServi
         var json = JsonSerializer.Serialize(model, _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("/users", content);
-        response.EnsureSuccessStatusCode();
-        
+        await response.EnsureSuccessOrThrowAsync();
+
         var location = response.Headers.Location?.ToString();
         var idString = location?.Split('/').LastOrDefault();
         return Guid.Parse(idString!);
@@ -71,41 +69,46 @@ public class UserService(IHttpClientFactory httpClientFactory, ILogger<UserServi
 
     public async Task<bool> UpdateUserAsync(Guid id, UserUpdateViewModel model)
     {
-        var json = JsonSerializer.Serialize(model, _jsonOptions);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"/users/{id}", content);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var json = JsonSerializer.Serialize(model, _jsonOptions);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PutAsync($"/users/{id}", content);
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 
     public async Task<bool> DeleteUserAsync(Guid id)
     {
-        var response = await _httpClient.DeleteAsync($"/users/{id}");
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"/users/{id}");
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 
     public async Task<PaginatedResponse<AttendanceViewModel>> GetUserAttendancesAsync(Guid userId, PaginationRequest request)
     {
-        try
-        {
-            var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
-            var response = await _httpClient.GetAsync($"/users/{userId}/attendances{queryParams}");
-            response.EnsureSuccessStatusCode();
-            
-            var json = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiPaginationResponse<AttendanceViewModel>>(json, _jsonOptions)!;
+        var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
+        var response = await _httpClient.GetAsync($"/users/{userId}/attendances{queryParams}");
+        var apiResponse = await response.ReadAsJsonOrThrowAsync<ApiPaginationResponse<AttendanceViewModel>>();
 
-            return new PaginatedResponse<AttendanceViewModel>
-            {
-                Items = apiResponse.Items,
-                TotalCount = apiResponse.TotalCount,
-                Page = request.Page + 1,
-                PageSize = request.PageSize
-            };
-        }
-        catch (Exception ex)
+        return new PaginatedResponse<AttendanceViewModel>
         {
-            logger.LogError(ex, "Error getting user attendances");
-            throw new ApplicationException("Failed to get user attendances.");
-        }
+            Items = apiResponse.Items,
+            TotalCount = apiResponse.TotalCount,
+            Page = request.Page + 1,
+            PageSize = request.PageSize
+        };
     }
 }

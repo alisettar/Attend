@@ -59,10 +59,10 @@ public class AuthController : Controller
     {
         var client = _httpClientFactory.CreateClient("AttendApi");
         await client.PostAsync("api/auth/logout", null);
-        
+
         Response.Cookies.Delete("TenantId");
         Response.Cookies.Delete("Username");
-        
+
         return RedirectToAction("Login");
     }
 }

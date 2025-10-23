@@ -1,12 +1,11 @@
-using MediatR;
 using Attend.Application.Repositories;
-using FluentValidation;
+using MediatR;
 
 namespace Attend.Application.Data.Attendances.Commands;
 
 public sealed record CheckInCommand(Guid AttendanceId) : IRequest<bool>;
 
-public sealed class CheckInCommandHandler(IAttendanceRepository repository) 
+public sealed class CheckInCommandHandler(IAttendanceRepository repository)
     : IRequestHandler<CheckInCommand, bool>
 {
     public async Task<bool> Handle(CheckInCommand request, CancellationToken cancellationToken)

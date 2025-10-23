@@ -1,11 +1,11 @@
-using MediatR;
 using Attend.Application.Repositories;
+using MediatR;
 
 namespace Attend.Application.Data.Users.Commands;
 
 public sealed record DeleteUserCommand(Guid Id) : IRequest<bool>;
 
-public sealed class DeleteUserCommandHandler(IUserRepository repository) 
+public sealed class DeleteUserCommandHandler(IUserRepository repository)
     : IRequestHandler<DeleteUserCommand, bool>
 {
     public async Task<bool> Handle(DeleteUserCommand request, CancellationToken cancellationToken)

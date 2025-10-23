@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Attend.Web.Models;
 
 public record PaginationRequest(
@@ -30,16 +32,30 @@ public record UserViewModel(
 
 public record UserCreateViewModel
 {
+    [Required(ErrorMessage = "Name is required")]
+    [StringLength(200, ErrorMessage = "Name cannot exceed 200 characters")]
     public string Name { get; set; } = string.Empty;
+
+    [EmailAddress(ErrorMessage = "Invalid email format")]
     public string? Email { get; set; }
-    public string? Phone { get; set; }
+
+    [Required(ErrorMessage = "Phone is required")]
+    [RegularExpression(@"^0?5[0-9]{2}\s?[0-9]{3}\s?[0-9]{2}\s?[0-9]{2}$", ErrorMessage = "Invalid phone format. Use: 05XX XXX XX XX")]
+    public string Phone { get; set; } = string.Empty;
 }
 
 public record UserUpdateViewModel
 {
+    [Required(ErrorMessage = "Name is required")]
+    [StringLength(200, ErrorMessage = "Name cannot exceed 200 characters")]
     public string Name { get; set; } = string.Empty;
+
+    [EmailAddress(ErrorMessage = "Invalid email format")]
     public string? Email { get; set; }
-    public string? Phone { get; set; }
+
+    [Required(ErrorMessage = "Phone is required")]
+    [RegularExpression(@"^0?5[0-9]{2}\s?[0-9]{3}\s?[0-9]{2}\s?[0-9]{2}$", ErrorMessage = "Invalid phone format. Use: 05XX XXX XX XX")]
+    public string Phone { get; set; } = string.Empty;
 }
 
 public record EventViewModel(

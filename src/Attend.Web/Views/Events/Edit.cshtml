@@ -1,27 +1,31 @@
+@using Microsoft.Extensions.Localization
+@inject IStringLocalizer<SharedResource> Localizer
 @model EventUpdateViewModel
 
 @{
-    ViewData["Title"] = "Edit Event";
+    ViewData["Title"] = Localizer["EditEvent"];
 }
 
-<h2>Edit Event</h2>
+<h2>@Localizer["EditEvent"]</h2>
 
 <form asp-action="Edit" method="post" class="mt-4">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+    
     <div class="mb-3">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
+        <label asp-for="Title" class="form-label">@Localizer["Title"] <span class="text-danger">*</span></label>
+        <input asp-for="Title" class="form-control" placeholder="@Localizer["EnterTitle"]" required />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     
     <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <label asp-for="Description" class="form-label">@Localizer["Description"]</label>
+        <textarea asp-for="Description" class="form-control" rows="4" placeholder="@Localizer["EnterDescription"]"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     
     <div class="mb-3">
-        <label asp-for="Date" class="form-label"></label>
-        <input asp-for="Date" type="datetime-local" class="form-control" />
+        <label asp-for="Date" class="form-label">@Localizer["Date"] <span class="text-danger">*</span></label>
+        <input asp-for="Date" type="datetime-local" class="form-control" required />
         <span asp-validation-for="Date" class="text-danger"></span>
     </div>
 
@@ -31,7 +35,7 @@
     }
     
     <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Update</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">@Localizer["Update"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@Localizer["Cancel"]</a>
     </div>
 </form>

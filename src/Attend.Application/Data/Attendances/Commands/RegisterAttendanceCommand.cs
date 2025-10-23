@@ -1,7 +1,7 @@
-using MediatR;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
 using FluentValidation;
+using MediatR;
 
 namespace Attend.Application.Data.Attendances.Commands;
 
@@ -10,7 +10,7 @@ public sealed record RegisterAttendanceCommand(AttendanceRequest Request) : IReq
 public sealed class RegisterAttendanceCommandHandler(
     IAttendanceRepository attendanceRepository,
     IUserRepository userRepository,
-    IEventRepository eventRepository) 
+    IEventRepository eventRepository)
     : IRequestHandler<RegisterAttendanceCommand, Guid>
 {
     public async Task<Guid> Handle(RegisterAttendanceCommand request, CancellationToken cancellationToken)
@@ -18,7 +18,7 @@ public sealed class RegisterAttendanceCommandHandler(
         // Check if user exists
         var user = await userRepository.GetByIdAsync(request.Request.UserId, cancellationToken);
         if (user == null)
-            throw new ValidationException("User not found.");
+            throw new ValidationException("Participant not found.");
 
         // Check if event exists
         var @event = await eventRepository.GetByIdAsync(request.Request.EventId, cancellationToken);
@@ -27,11 +27,11 @@ public sealed class RegisterAttendanceCommandHandler(
 
         // Check if already registered
         var existingAttendance = await attendanceRepository.GetByUserAndEventAsync(
-            request.Request.UserId, 
-            request.Request.EventId, 
+            request.Request.UserId,
+            request.Request.EventId,
             cancellationToken);
         if (existingAttendance != null)
-            throw new ValidationException("User is already registered for this event.");
+            throw new ValidationException("Participant is already registered for this event.");
 
         var attendance = Attendance.Create(
             userId: request.Request.UserId,
@@ -48,10 +48,10 @@ public sealed class RegisterAttendanceCommandValidator : AbstractValidator<Regis
     {
         RuleFor(x => x.Request.UserId)
             .NotEmpty()
-            .WithMessage("User ID cannot be empty.");
-        
+            .WithMessage("User ID is required.");
+
         RuleFor(x => x.Request.EventId)
             .NotEmpty()
-            .WithMessage("Event ID cannot be empty.");
+            .WithMessage("Event ID is required.");
     }
 }

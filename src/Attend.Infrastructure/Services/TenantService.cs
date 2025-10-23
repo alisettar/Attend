@@ -1,7 +1,7 @@
 using Attend.Application.Interfaces;
 using Attend.Domain.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Attend.Infrastructure.Services;
 
@@ -15,8 +15,8 @@ public class TenantService : ITenantService
     {
         _tenantsConfig = tenantsConfig.Value;
         _logger = logger;
-        
-        _logger.LogInformation("TenantService initialized. Available tenants: {Tenants}", 
+
+        _logger.LogInformation("TenantService initialized. Available tenants: {Tenants}",
             string.Join(", ", _tenantsConfig.Tenants.Keys));
     }
 
@@ -26,13 +26,13 @@ public class TenantService : ITenantService
     {
         _logger.LogInformation("SetTenantId called with: {TenantId}", tenantId);
         _logger.LogInformation("Available tenants: {Tenants}", string.Join(", ", _tenantsConfig.Tenants.Keys));
-        
+
         if (!_tenantsConfig.Tenants.ContainsKey(tenantId))
         {
             _logger.LogError("Tenant '{TenantId}' not found in configuration", tenantId);
             throw new InvalidOperationException($"Tenant '{tenantId}' not found.");
         }
-        
+
         _currentTenantId = tenantId;
         _logger.LogInformation("Current tenant set to: {TenantId}", tenantId);
     }
@@ -51,8 +51,8 @@ public class TenantService : ITenantService
         if (string.IsNullOrEmpty(_currentTenantId))
             return null;
 
-        return _tenantsConfig.Tenants.TryGetValue(_currentTenantId, out var config) 
-            ? config 
+        return _tenantsConfig.Tenants.TryGetValue(_currentTenantId, out var config)
+            ? config
             : null;
     }
 
@@ -76,7 +76,7 @@ public class TenantService : ITenantService
                 return tenantId;
             }
         }
-        
+
         _logger.LogWarning("No tenant found for hash '{Hash}'", hash);
         return null;
     }

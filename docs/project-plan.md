@@ -4,7 +4,7 @@
 ### Project Information
 - **Project Location**: `C:\Users\Alisettar\source\repos\Attend\`
 - **Version Control**: Git
-- **Current Status**: Phase 13 Complete ✅ - DEPLOYED TO AZURE
+- **Current Status**: Phase 1-9, 13-15 Complete ✅ | Phase 14 MOSTLY DONE 🚀 | DEPLOYED TO AZURE
 - **Database**: SQLite Multi-Tenant (Database per Tenant)
 
 ---
@@ -142,6 +142,73 @@
 - API: https://api-gencligianlamasanati.azurewebsites.net
 - Web: https://gencligianlamasanati.azurewebsites.net
 
+### Phase 14: Public Registration Form - MOSTLY COMPLETED 🚀
+**Priority: HIGH - 90% DONE**
+
+**Tenant Hash System - COMPLETED ✅**
+- ✅ Tenant hash/slug generation (Erkekler: 7k9m2x5w, Kadınlar: 3p8n6r4t)
+- ✅ appsettings.json with tenant hash mappings (Dev + Production)
+- ✅ TenantService.ResolveTenantByHash() implementation
+- ✅ Tenant resolution by hash in public endpoints
+
+**Backend (API) - COMPLETED ✅**
+- ✅ PublicRegisterCommand (MediatR)
+- ✅ PublicRegisterCommandHandler with scoped tenant service
+- ✅ PublicRegisterCommandValidator (FluentValidation)
+  - ✅ TR phone format validation: `^(\+90|0)?5\d{9}$`
+  - ✅ Duplicate phone check (tenant-scoped)
+  - ✅ Name validation (required, max 200 chars)
+- ✅ PublicModule: POST /api/public/register/{tenantHash}
+- ✅ Exception handling with user-friendly messages
+- [ ] Rate limiting middleware (IP-based, 5 req/min) - **MISSING**
+- [ ] Google reCAPTCHA v3 backend verification - **MISSING**
+
+**Frontend (Web) - COMPLETED ✅**
+- ✅ RegisterController (GET/POST actions)
+- ✅ Views/Register/Index.cshtml (Public registration form)
+  - ✅ Mobile-first responsive design
+  - ✅ Large touch targets (54px buttons)
+  - ✅ Phone input masking (TR format: 05XX XXX XX XX)
+  - ✅ Auto-focus on name field
+  - ✅ Client-side validation
+  - ✅ Modern gradient design matching branding
+- ✅ Views/Register/Success.cshtml (QR display page)
+  - ✅ QR code rendered from DB (base64)
+  - ✅ User name display
+  - [ ] PNG download button - **TODO**
+  - [ ] WhatsApp share option - **FUTURE (Phase 11)**
+- ✅ KVKK Compliance pages:
+  - ✅ PrivacyPolicy.cshtml (/privacy-policy)
+  - ✅ ConsentText.cshtml (/consent-text)
+  - ✅ Checkbox for acceptance (required)
+  - ✅ Links to policy pages in checkbox label
+
+**Security & Compliance:**
+- ✅ Google reCAPTCHA v3 frontend integration (token generation)
+- [ ] Google reCAPTCHA v3 backend verification - **MISSING**
+- [ ] Rate limiting configuration - **MISSING**
+- ✅ CSRF token validation (AntiForgeryToken)
+- ✅ Input sanitization (FluentValidation)
+- ✅ KVKK compliance text
+- ✅ Açık Rıza Metni (explicit consent)
+
+**Testing:**
+- [ ] Unit tests (validator, command handler) - **TODO**
+- [ ] Integration tests (duplicate check, rate limit) - **TODO**
+- ✅ Manual mobile responsive testing
+- [ ] reCAPTCHA integration test - **TODO**
+
+**Remaining Work:**
+1. Backend reCAPTCHA token verification
+2. Rate limiting middleware (IP-based)
+3. QR code PNG download button on success page
+4. Unit & integration tests
+5. Localization keys validation (TR/EN)
+
+**Public Registration URL Format:**
+- Erkekler (Men): https://gencligianlamasanati.azurewebsites.net/register/7k9m2x5w
+- Kadınlar (Women): https://gencligianlamasanati.azurewebsites.net/register/3p8n6r4t
+
 ### Phase 15: Branding System - COMPLETED ✅
 **Completed:**
 - ✅ BrandingSettings model (AppName, CompanyName, Colors, Logo, Favicon)
@@ -180,65 +247,14 @@
 
 ## 🚧 Pending Features
 
-### Phase 14: Public Registration Form - PENDING ⭐
-**Priority: HIGH**
-
-**Tenant Hash System:**
-- [ ] Tenant hash/slug generation (erkekler → abc123xyz)
-- [ ] Update appsettings.json with tenant hash mappings
-- [ ] Tenant resolution by hash in public endpoints
-
-**Backend (API):**
-- [ ] PublicRegisterCommand (MediatR)
-- [ ] PublicRegisterCommandValidator (FluentValidation)
-  - [ ] TR phone format validation (+90 5XX XXX XX XX)
-  - [ ] Duplicate phone check (tenant-scoped)
-  - [ ] Name validation (required, max 200 chars)
+### Phase 14: Final Touches - IN PROGRESS ⭐
+**Remaining Items:**
+- [ ] Backend reCAPTCHA v3 token verification (verify with Google API)
 - [ ] Rate limiting middleware (IP-based, 5 req/min)
-- [ ] Google reCAPTCHA v3 integration
-- [ ] Public endpoint: POST /api/public/register/{tenantHash}
-
-**Frontend (Web):**
-- [ ] RegisterController (GET/POST actions)
-- [ ] Public registration form view
-  - [ ] Mobile-first responsive design
-  - [ ] Large touch targets (min 44px)
-  - [ ] Phone input masking (TR format)
-  - [ ] Auto-focus on name field
-  - [ ] Client-side validation
-- [ ] Success page with QR display
-  - [ ] QR code rendered from DB (base64)
-  - [ ] PNG download button
-  - [ ] WhatsApp share option (future: Phase 11)
-- [ ] KVKK Compliance pages:
-  - [✅] Privacy Policy page (/privacy-policy)
-  - [✅] Consent Text page (/consent-text)
-  - [ ] Checkbox for acceptance (required)
-  - [ ] Links to policy pages
-- [ ] Full TR/EN localization
-
-**Security & Compliance:**
-- [ ] Google reCAPTCHA v3 (spam prevention)
-- [ ] Rate limiting configuration
-- [ ] CSRF token validation
-- [ ] Input sanitization
-- [✅] KVKK compliance text
-- [✅] Açık Rıza Metni (explicit consent)
-
-**Testing:**
-- [ ] Unit tests (validator, command handler)
-- [ ] Integration tests (duplicate check, rate limit)
-- [ ] Mobile responsive testing
-- [ ] reCAPTCHA integration test
-
-**Notes:**
-- Public endpoint (no authentication required)
-- Tenant identified by hash in URL: /register/{tenantHash}
-- QR code displayed immediately after registration
-- Phone must be unique per tenant
-- KVKK checkbox required before submission
-
----
+- [ ] QR code PNG download button on Success page
+- [ ] Unit tests for PublicRegisterCommandValidator
+- [ ] Integration tests for duplicate phone check
+- [ ] Localization keys validation (ensure all keys exist)
 
 ### Phase 10: Event Management Enhancements - NOT STARTED
 **Priority: Medium**
@@ -255,6 +271,7 @@
 - [ ] Send QR codes after registration
 - [ ] Event reminder notifications
 - [ ] Bulk messaging functionality
+- [ ] WhatsApp share button on Registration Success page
 
 ### Phase 12: Admin & Bulk Operations - NOT STARTED
 **Priority: Medium**
@@ -269,6 +286,8 @@
 ## 📋 Technical Debt & Improvements
 
 ### High Priority
+- [ ] Implement rate limiting for public registration
+- [ ] Add comprehensive unit test coverage
 - [ ] Implement event capacity limits
 - [ ] Add attendee registration workflow
 - [ ] Implement soft delete for entities
@@ -279,10 +298,12 @@
 - [ ] Add user avatars
 - [ ] Event categories/tags
 - [ ] Advanced reporting and analytics
+- [ ] Performance monitoring (Application Insights)
 
 ### Low Priority
 - [ ] Theme switcher (Dark/Light toggle)
 - [ ] Email notifications
+- [ ] Custom domain setup (non-Azure domain)
 
 ---
 
@@ -318,8 +339,8 @@ Attendances
 ```
 
 **Multi-Tenant Databases:**
-- AttendDb_Erkekler.db (Tenant: abc123xyz / Tenant1)
-- AttendDb_Kadinlar.db (Tenant: def456uvw / Tenant2)
+- AttendDb_Erkekler.db (Tenant1, Hash: 7k9m2x5w)
+- AttendDb_Kadinlar.db (Tenant2, Hash: 3p8n6r4t)
 - Same structure, isolated data
 - **Tenant Hash Mapping**: Hash values used in public URLs for security
 - **Note:** Database files excluded from git (.gitignore), manual upload to Azure required
@@ -342,6 +363,7 @@ Attendances
 - Bootstrap 5.3.2 (Dark Theme)
 - Bootstrap Icons 1.11.1
 - Font Awesome 6.4.0 (@ icon for email)
+- Google reCAPTCHA v3 (spam prevention)
 - JSON-based Localization (TR/EN)
 
 ### Patterns & Architecture
@@ -359,23 +381,25 @@ Attendances
 ## 📝 Next Steps
 
 ### Immediate (This Week)
-1. **Phase 14: Public Registration Form** ⭐
-   - Tenant hash system
-   - Public registration endpoint
-   - Google reCAPTCHA integration
-2. Mobile-responsive testing
-3. Rate limiting implementation
+1. **Phase 14 Completion** ⭐
+   - Backend reCAPTCHA verification
+   - Rate limiting middleware
+   - QR download button
+   - Testing
+2. Production monitoring setup
+3. Custom domain configuration
 
 ### Short-term (Next 2 Weeks)
-1. Bulk user import/export
-2. Advanced event filtering
-3. Event categories
+1. Unit & integration test coverage
+2. Bulk user import/export (Phase 12)
+3. Advanced event filtering (Phase 10)
+4. Performance optimization
 
 ### Long-term (Next Month)
-1. Messaging integration (WhatsApp/Telegram)
-2. Custom domain setup
-3. Production monitoring
-4. Performance optimization
+1. Messaging integration (WhatsApp/Telegram) - Phase 11
+2. Event categories/tags - Phase 10
+3. Admin panel enhancements - Phase 12
+4. Advanced analytics dashboard
 
 ---
 
@@ -388,20 +412,26 @@ Attendances
 - Tenant databases: AttendDb_Erkekler.db, AttendDb_Kadinlar.db
 
 ### Production (LIVE ✅)
-- Azure App Service (Basic Tier) × 2
+- **Azure App Service (Basic Tier) × 2**
   - API: https://api-gencligianlamasanati.azurewebsites.net
   - Web: https://gencligianlamasanati.azurewebsites.net
 - SQLite databases stored on Azure file system
-- Database deployment: Manual upload via Kudu Console
+- Database deployment: Manual upload via Kudu Console (/home/site/wwwroot/Data/)
 - Environment-based configuration (appsettings.Production.json)
 - GitHub Actions CI/CD (Service Principal auth)
 - Auto-deploy on master branch push
 - Separate workflows for API and Web
+- Database backups: Manual (download via Kudu)
 
 **Branding Configuration:**
 - Managed via appsettings.json
 - Colors: #667eea (primary), #764ba2 (secondary)
 - Email format: Anti-spam icon protection
+- Favicon: SVG gradient logo
+
+**Public Registration URLs:**
+- Erkekler: https://gencligianlamasanati.azurewebsites.net/register/7k9m2x5w
+- Kadınlar: https://gencligianlamasanati.azurewebsites.net/register/3p8n6r4t
 
 ---
 
@@ -423,6 +453,16 @@ Attendances
 6. All subsequent Web → API requests include cookies
 7. API TenantMiddleware reads cookie and sets tenant context
 8. DbContext connects to correct tenant database
+
+**Public Registration Flow:**
+1. User visits `/register/{tenantHash}` (no authentication)
+2. Web displays registration form
+3. User fills name, phone, accepts KVKK
+4. Form submits to API `/api/public/register/{tenantHash}`
+5. API resolves tenant from hash
+6. API validates phone uniqueness within tenant
+7. API creates user with auto-generated QR code
+8. Web redirects to success page with QR code display
 
 **QR Code Generation:**
 - Backend generation using QRCoder library
@@ -450,8 +490,9 @@ Attendances
 - `AZURE_TRANSFER.md` - Deployment transfer guide
 - `AZURE_COMMANDS.md` - Windows PowerShell commands
 - `README.md` - Project overview
+- `project-plan.md` - This file (development roadmap)
 
 ---
 
 *Last Updated: October 23, 2025*
-*Status: Phase 1-9, 13, 15 Complete ✅ | Phase 14 Pending ⭐ | Phase 10-12 Pending | DEPLOYED TO AZURE 🚀*
+*Status: Phase 1-9, 13, 15 Complete ✅ | Phase 14: 90% Done 🚀 | Phase 10-12 Pending | DEPLOYED TO AZURE 🚀*

@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
 using Attend.Application.Data;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
 using Attend.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attend.Infrastructure.Repositories;
 
@@ -28,7 +28,7 @@ public class EventRepository(AttendDbContext context) : IEventRepository
             .ToListAsync(cancellationToken);
 
     public async Task<(List<Event> items, long totalCount)> GetPaginatedAsync(
-        PaginationRequest request, 
+        PaginationRequest request,
         CancellationToken cancellationToken = default)
     {
         var query = context.Events.AsNoTracking().AsQueryable();
@@ -36,7 +36,7 @@ public class EventRepository(AttendDbContext context) : IEventRepository
         if (!string.IsNullOrEmpty(request.SearchText))
         {
             var searchUpper = request.SearchText.ToUpper();
-            query = query.Where(e => 
+            query = query.Where(e =>
                 e.Title.ToUpper().Contains(searchUpper) ||
                 (e.Description != null && e.Description.ToUpper().Contains(searchUpper)));
         }

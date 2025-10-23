@@ -1,3 +1,4 @@
+using Attend.Web.Extensions;
 using Attend.Web.Models;
 using Attend.Web.Services.Interfaces;
 using System.Text.Json;
@@ -15,63 +16,45 @@ public class AttendanceService(IHttpClientFactory httpClientFactory, ILogger<Att
 
     public async Task<AttendanceViewModel?> GetAttendanceByIdAsync(Guid id)
     {
-        var response = await _httpClient.GetAsync($"/attendances/{id}");
-        if (!response.IsSuccessStatusCode) return null;
-        
-        var json = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<AttendanceViewModel>(json, _jsonOptions);
+        try
+        {
+            var response = await _httpClient.GetAsync($"/attendances/{id}");
+            return await response.ReadAsJsonOrThrowAsync<AttendanceViewModel>();
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return null;
+        }
     }
 
     public async Task<PaginatedResponse<AttendanceViewModel>> GetEventAttendeesAsync(Guid eventId, PaginationRequest request)
     {
-        try
-        {
-            var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
-            var response = await _httpClient.GetAsync($"/events/{eventId}/attendees{queryParams}");
-            response.EnsureSuccessStatusCode();
-            
-            var json = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiPaginationResponse<AttendanceViewModel>>(json, _jsonOptions)!;
+        var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
+        var response = await _httpClient.GetAsync($"/events/{eventId}/attendees{queryParams}");
+        var apiResponse = await response.ReadAsJsonOrThrowAsync<ApiPaginationResponse<AttendanceViewModel>>();
 
-            return new PaginatedResponse<AttendanceViewModel>
-            {
-                Items = apiResponse.Items,
-                TotalCount = apiResponse.TotalCount,
-                Page = request.Page + 1,
-                PageSize = request.PageSize
-            };
-        }
-        catch (Exception ex)
+        return new PaginatedResponse<AttendanceViewModel>
         {
-            logger.LogError(ex, "Error getting event attendees");
-            throw new ApplicationException("Failed to get attendees.");
-        }
+            Items = apiResponse.Items,
+            TotalCount = apiResponse.TotalCount,
+            Page = request.Page + 1,
+            PageSize = request.PageSize
+        };
     }
 
     public async Task<PaginatedResponse<AttendanceViewModel>> GetUserAttendancesAsync(Guid userId, PaginationRequest request)
     {
-        try
-        {
-            var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
-            var response = await _httpClient.GetAsync($"/users/{userId}/attendances{queryParams}");
-            response.EnsureSuccessStatusCode();
-            
-            var json = await response.Content.ReadAsStringAsync();
-            var apiResponse = JsonSerializer.Deserialize<ApiPaginationResponse<AttendanceViewModel>>(json, _jsonOptions)!;
+        var queryParams = $"?paginationRequest={{\"Page\":{request.Page},\"PageSize\":{request.PageSize}}}";
+        var response = await _httpClient.GetAsync($"/users/{userId}/attendances{queryParams}");
+        var apiResponse = await response.ReadAsJsonOrThrowAsync<ApiPaginationResponse<AttendanceViewModel>>();
 
-            return new PaginatedResponse<AttendanceViewModel>
-            {
-                Items = apiResponse.Items,
-                TotalCount = apiResponse.TotalCount,
-                Page = request.Page + 1,
-                PageSize = request.PageSize
-            };
-        }
-        catch (Exception ex)
+        return new PaginatedResponse<AttendanceViewModel>
         {
-            logger.LogError(ex, "Error getting user attendances");
-            throw new ApplicationException("Failed to get user attendances.");
-        }
+            Items = apiResponse.Items,
+            TotalCount = apiResponse.TotalCount,
+            Page = request.Page + 1,
+            PageSize = request.PageSize
+        };
     }
 
     public async Task<Guid> RegisterAttendanceAsync(Guid userId, Guid eventId)
@@ -79,8 +62,8 @@ public class AttendanceService(IHttpClientFactory httpClientFactory, ILogger<Att
         var json = JsonSerializer.Serialize(userId, _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync($"/events/{eventId}/register", content);
-        response.EnsureSuccessStatusCode();
-        
+        await response.EnsureSuccessOrThrowAsync();
+
         var location = response.Headers.Location?.ToString();
         var idString = location?.Split('/').LastOrDefault();
         return Guid.Parse(idString!);
@@ -88,16 +71,32 @@ public class AttendanceService(IHttpClientFactory httpClientFactory, ILogger<Att
 
     public async Task<bool> CheckInAsync(Guid attendanceId)
     {
-        var response = await _httpClient.PostAsync($"/attendances/{attendanceId}/checkin", null);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var response = await _httpClient.PostAsync($"/attendances/{attendanceId}/checkin", null);
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 
     public async Task<bool> CheckInAsync(Guid eventId, Guid userId)
     {
-        var json = JsonSerializer.Serialize(new { userId }, _jsonOptions);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync($"/events/{eventId}/checkin", content);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var json = JsonSerializer.Serialize(new { userId }, _jsonOptions);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync($"/events/{eventId}/checkin", content);
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 
     public async Task<CheckInResultViewModel> CheckInByQRCodeAsync(string qrCode, Guid eventId)
@@ -106,20 +105,21 @@ public class AttendanceService(IHttpClientFactory httpClientFactory, ILogger<Att
         var json = JsonSerializer.Serialize(request, _jsonOptions);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
         var response = await _httpClient.PostAsync("/checkin/qrcode", content);
-        
-        if (!response.IsSuccessStatusCode)
-        {
-            var error = await response.Content.ReadAsStringAsync();
-            throw new ApplicationException(error);
-        }
-        
-        var resultJson = await response.Content.ReadAsStringAsync();
-        return JsonSerializer.Deserialize<CheckInResultViewModel>(resultJson, _jsonOptions)!;
+
+        return await response.ReadAsJsonOrThrowAsync<CheckInResultViewModel>();
     }
 
-    public async Task<bool> CancelAttendanceAsync(Guid attendanceId)
+    public async Task<bool> DeleteAttendanceAsync(Guid attendanceId)
     {
-        var response = await _httpClient.DeleteAsync($"/attendances/{attendanceId}");
-        return response.IsSuccessStatusCode;
+        try
+        {
+            var response = await _httpClient.DeleteAsync($"/attendances/{attendanceId}");
+            await response.EnsureSuccessOrThrowAsync();
+            return true;
+        }
+        catch (Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return false;
+        }
     }
 }

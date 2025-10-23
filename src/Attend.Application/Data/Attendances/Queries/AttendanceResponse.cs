@@ -1,5 +1,4 @@
 using Attend.Domain.Entities;
-using Attend.Domain.Enums;
 
 namespace Attend.Application.Data.Attendances.Queries;
 

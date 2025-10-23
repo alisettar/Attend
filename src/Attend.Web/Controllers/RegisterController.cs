@@ -1,5 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+using Attend.Web.Exceptions;
+using Attend.Web.Extensions;
 using Attend.Web.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
 
@@ -31,73 +33,57 @@ public class RegisterController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.TenantHash = tenantHash;
+            ViewBag.RecaptchaSiteKey = _configuration["GoogleReCaptcha:SiteKey"];
             return View("Index", model);
         }
 
         try
         {
-            var request = new { name = model.Name, phone = model.Phone };
+            var request = new
+            {
+                name = model.Name,
+                phone = model.Phone,
+                recaptchaToken = model.RecaptchaToken
+            };
+
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync(
-                $"api/public/register/{tenantHash}", 
-                content);
+            var response = await _httpClient.PostAsync($"api/public/register/{tenantHash}", content);
+            var result = await response.ReadAsJsonOrThrowAsync<PublicRegisterResultDto>();
 
-            if (response.IsSuccessStatusCode)
+            return RedirectToAction("Success", new
             {
-                var resultJson = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<PublicRegisterResultDto>(resultJson, 
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                return RedirectToAction("Success", new { 
-                    userId = result?.UserId,
-                    userName = result?.UserName
-                });
-            }
-            else
-            {
-                var errorMessage = await response.Content.ReadAsStringAsync();
-                ModelState.AddModelError("", errorMessage);
-                ViewBag.TenantHash = tenantHash;
-                return View("Index", model);
-            }
+                userId = result.UserId,
+                userName = result.UserName,
+                qrCodeImage = result.QRCodeImage
+            });
         }
-        catch (Exception ex)
+        catch (ValidationApiException vex)
         {
-            // Log the actual error for debugging
-            Console.WriteLine($"Registration error: {ex.Message}");
-            Console.WriteLine($"Stack trace: {ex.StackTrace}");
-            
-            ModelState.AddModelError("", $"Kayıt işlemi başarısız: {ex.Message}");
-            ViewBag.TenantHash = tenantHash;
-            return View("Index", model);
+            ModelState.AddModelError("", vex.Message);
         }
+        catch (ApiException aex)
+        {
+            ModelState.AddModelError("", aex.Message);
+        }
+        catch (Exception)
+        {
+            ModelState.AddModelError("", "Kayıt işlemi başarısız. Lütfen tekrar deneyin.");
+        }
+
+        ViewBag.TenantHash = tenantHash;
+        ViewBag.RecaptchaSiteKey = _configuration["GoogleReCaptcha:SiteKey"];
+        return View("Index", model);
     }
 
     [HttpGet("/register/success")]
-    public async Task<IActionResult> Success(Guid userId, string userName)
+    public IActionResult Success(Guid userId, string userName, string qrCodeImage)
     {
-        try
-        {
-            // Fetch QR code from API
-            var response = await _httpClient.GetAsync($"users/{userId}");
-            
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                var user = JsonSerializer.Deserialize<UserDto>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        ViewBag.QRCodeImage = qrCodeImage;
+        ViewBag.UserName = userName;
+        ViewBag.UserId = userId;
 
-                ViewBag.QRCodeImage = user?.QRCodeImage;
-                ViewBag.UserName = userName;
-                ViewBag.UserId = userId;
-                
-                return View();
-            }
-        }
-        catch { }
-
-        return RedirectToAction("Index", "Home");
+        return View();
     }
 }

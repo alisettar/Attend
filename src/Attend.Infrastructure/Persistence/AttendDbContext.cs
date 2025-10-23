@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Attend.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace Attend.Infrastructure.Persistence;
 

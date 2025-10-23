@@ -1,10 +1,10 @@
+using Attend.Application.Data;
+using Attend.Application.Data.Events.Commands;
+using Attend.Application.Data.Events.Queries;
 using Carter;
 using MediatR;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Attend.Application.Data;
-using Attend.Application.Data.Events.Commands;
-using Attend.Application.Data.Events.Queries;
 
 namespace Attend.Api.Modules;
 
@@ -34,7 +34,7 @@ public class EventsModule : ICarterModule
         HttpContext context)
     {
         var result = await sender.Send(
-            new GetEventsQuery(paginationRequest ?? new()), 
+            new GetEventsQuery(paginationRequest ?? new()),
             context.RequestAborted);
         return TypedResults.Ok(result);
     }

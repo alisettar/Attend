@@ -1,28 +1,28 @@
-using MediatR;
 using Attend.Application.Repositories;
 using Attend.Domain.Enums;
+using MediatR;
 
 namespace Attend.Application.Data.Reports.Queries;
 
 public class GetDashboardStatisticsQueryHandler(
     IEventRepository eventRepository,
     IUserRepository userRepository,
-    IAttendanceRepository attendanceRepository) 
+    IAttendanceRepository attendanceRepository)
     : IRequestHandler<GetDashboardStatisticsQuery, DashboardStatisticsResponse>
 {
     public async Task<DashboardStatisticsResponse> Handle(
-        GetDashboardStatisticsQuery request, 
+        GetDashboardStatisticsQuery request,
         CancellationToken cancellationToken)
     {
         var totalEvents = await eventRepository.CountAsync(cancellationToken);
         var totalUsers = await userRepository.CountAsync(cancellationToken);
-        
+
         var allAttendances = await attendanceRepository.GetAllAsync(cancellationToken);
         var totalAttendances = allAttendances.Count;
         var totalCheckedIn = allAttendances.Count(a => a.Status == AttendanceStatus.CheckedIn);
-        
-        var checkInRate = totalAttendances > 0 
-            ? Math.Round((double)totalCheckedIn / totalAttendances * 100, 2) 
+
+        var checkInRate = totalAttendances > 0
+            ? Math.Round((double)totalCheckedIn / totalAttendances * 100, 2)
             : 0;
 
         // Top 5 Events

@@ -1,7 +1,7 @@
+using Attend.Application.Behaviors;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
-using Attend.Application.Behaviors;
 
 namespace Attend.Application;
 

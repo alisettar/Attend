@@ -19,7 +19,7 @@ public class ReportService(IHttpClientFactory httpClientFactory, ILogger<ReportS
         {
             var response = await _httpClient.GetAsync("/reports/statistics");
             if (!response.IsSuccessStatusCode) return null;
-            
+
             var json = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<DashboardStatisticsViewModel>(json, _jsonOptions);
         }
