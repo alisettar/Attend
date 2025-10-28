@@ -101,19 +101,10 @@
             line-height: 1.4;
         }
         .instructions-box .hint {
-            font-size: 0.85rem;
-            color: #6c757d;
-            line-height: 1.5;
+            font-size: 0.9rem;
+            color: #495057;
+            line-height: 1.6;
             margin: 0;
-        }
-        .instructions-box .method {
-            background: #e3f2fd;
-            padding: 8px;
-            border-radius: 6px;
-            margin-top: 8px;
-            font-size: 0.85rem;
-            color: #1976d2;
-            font-weight: 500;
         }
         .btn {
             min-height: 48px;
@@ -190,7 +181,7 @@
                 <i class="bi bi-check-lg"></i>
             </div>
             
-            <h2>✅ Kayıt Başarılı!</h2>
+            <h2>Kayıt Başarılı!</h2>
             <p class="text-muted welcome-text">Hoş geldiniz, <strong>@userName</strong></p>
             
             <div class="qr-container">
@@ -212,20 +203,15 @@
                     <!-- Mobile Instructions -->
                     <div class="mobile-only">
                         <div class="hint">
-                            <strong>💡 QR'ı kaydetmek için:</strong>
-                        </div>
-                        <div class="method">
-                            📱 <strong>Yöntem 1:</strong> Aşağıdaki "Gönder" butonuna basıp kendinize gönderin (WhatsApp, Telegram, E-posta vb.)
-                        </div>
-                        <div class="method mt-1">
-                            📸 <strong>Yöntem 2:</strong> Ekran görüntüsü alın ve telefonunuzun galerisine kaydedin
+                            <strong>💡 QR'ı kaydetmek için:</strong><br>
+                            Aşağıdaki "Gönder" butonuna basıp kendinize gönderin (WhatsApp, Telegram, E-posta) veya ekran görüntüsü alarak telefonunuzun galerisine kaydedin.
                         </div>
                     </div>
                     
                     <!-- Desktop Instructions -->
                     <div class="desktop-only">
                         <div class="hint">
-                            💡 QR kodunu kaydetmek için aşağıdaki butonu kullanın veya sağ tıklayıp "Resmi Farklı Kaydet" seçin
+                            💡 QR kodunu kaydetmek için aşağıdaki butonu kullanın veya sağ tıklayıp "Resmi Farklı Kaydet" seçin.
                         </div>
                     </div>
                 </div>
@@ -284,7 +270,7 @@
             } catch (err) {
                 if (err.name !== 'AbortError') {
                     // If share fails, show alert with instructions
-                    alert('QR kodunu kaydetmek için:\n\n📸 Ekran görüntüsü alın\n(Güç + Ses Aşağı tuşları)');
+                    alert('QR kodunu kaydetmek için:\n\nEkran görüntüsü alın ve telefonunuzun galerisine kaydedin.');
                 }
             }
         }
