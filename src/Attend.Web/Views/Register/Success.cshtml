@@ -29,27 +29,28 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 20px;
+            padding: 10px;
         }
         .success-card {
-            max-width: 500px;
+            max-width: 450px;
+            width: 100%;
             margin: 0 auto;
             background: white;
-            border-radius: 20px;
-            padding: 40px 30px;
+            border-radius: 15px;
+            padding: 20px 15px 15px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
         .success-icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
+            font-size: 30px;
             color: white;
             animation: scaleIn 0.5s ease-out;
         }
@@ -57,23 +58,69 @@
             from { transform: scale(0); }
             to { transform: scale(1); }
         }
+        h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+        .welcome-text {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
         .qr-container {
             background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 30px 0;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
         }
         .qr-code {
-            max-width: 250px;
+            max-width: 200px;
             height: auto;
             margin: 0 auto;
             display: block;
+            border-radius: 8px;
+        }
+        .qr-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        .instructions-box {
+            margin-top: 12px;
+            padding: 12px;
+            background: #fff;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+        .instructions-box .main-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        .instructions-box .hint {
+            font-size: 0.85rem;
+            color: #6c757d;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .instructions-box .method {
+            background: #e3f2fd;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #1976d2;
+            font-weight: 500;
         }
         .btn {
-            min-height: 50px;
-            border-radius: 12px;
+            min-height: 48px;
+            border-radius: 10px;
             font-weight: 600;
-            margin: 5px;
+            margin: 5px 0;
+            font-size: 0.95rem;
         }
         .btn-primary {
             background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
@@ -83,13 +130,56 @@
             border: 2px solid var(--primary-color);
             color: var(--primary-color);
         }
-        .btn:hover {
-            transform: translateY(-2px);
+        .btn:active {
+            transform: scale(0.98);
         }
         .company-name {
             color: #6c757d;
-            font-size: 0.9rem;
-            margin-top: 20px;
+            font-size: 0.8rem;
+            margin-top: 12px;
+        }
+        
+        /* Detect mobile device */
+        .desktop-only {
+            display: block;
+        }
+        .mobile-only {
+            display: none;
+        }
+        
+        @@media (max-width: 768px) {
+            .desktop-only {
+                display: none;
+            }
+            .mobile-only {
+                display: block;
+            }
+            body {
+                padding: 5px;
+            }
+            .success-card {
+                padding: 15px 12px 12px;
+                border-radius: 12px;
+            }
+            h2 {
+                font-size: 1.2rem;
+            }
+            .success-icon {
+                width: 45px;
+                height: 45px;
+                font-size: 25px;
+                margin-bottom: 8px;
+            }
+            .qr-code {
+                max-width: 180px;
+            }
+            .qr-container {
+                padding: 12px;
+                margin: 12px 0;
+            }
+            .instructions-box .main-text {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
@@ -100,11 +190,11 @@
                 <i class="bi bi-check-lg"></i>
             </div>
             
-            <h2 class="mb-3">Kayıt Başarılı!</h2>
-            <p class="text-muted mb-4">Hoş geldiniz, <strong>@userName</strong>!</p>
+            <h2>✅ Kayıt Başarılı!</h2>
+            <p class="text-muted welcome-text">Hoş geldiniz, <strong>@userName</strong></p>
             
             <div class="qr-container">
-                <p class="fw-semibold mb-3">QR Kodunuz</p>
+                <div class="qr-label">QR Kodunuz</div>
                 @if (!string.IsNullOrEmpty(qrCodeImage))
                 {
                     <img src="data:image/png;base64,@qrCodeImage" 
@@ -112,17 +202,44 @@
                          class="qr-code"
                          id="qrImage" />
                 }
-                <p class="text-muted small mt-3">
-                    Bu QR kodu etkinliklere katılırken kullanabilirsiniz
-                </p>
+                
+                <div class="instructions-box">
+                    <div class="main-text">
+                        <i class="bi bi-qr-code-scan text-primary"></i>
+                        Bu QR kodu etkinliklere katılırken gösterin
+                    </div>
+                    
+                    <!-- Mobile Instructions -->
+                    <div class="mobile-only">
+                        <div class="hint">
+                            <strong>💡 QR'ı kaydetmek için:</strong>
+                        </div>
+                        <div class="method">
+                            📱 <strong>Yöntem 1:</strong> Aşağıdaki "Gönder" butonuna basıp kendinize gönderin (WhatsApp, Telegram, E-posta vb.)
+                        </div>
+                        <div class="method mt-1">
+                            📸 <strong>Yöntem 2:</strong> Ekran görüntüsü alın ve telefonunuzun galerisine kaydedin
+                        </div>
+                    </div>
+                    
+                    <!-- Desktop Instructions -->
+                    <div class="desktop-only">
+                        <div class="hint">
+                            💡 QR kodunu kaydetmek için aşağıdaki butonu kullanın veya sağ tıklayıp "Resmi Farklı Kaydet" seçin
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="d-grid gap-2">
-                <button class="btn btn-primary" onclick="downloadQR()">
-                    <i class="bi bi-download"></i> QR Kodu İndir
+                <!-- Desktop: Show download button -->
+                <button class="btn btn-primary desktop-only" onclick="downloadQR()">
+                    <i class="bi bi-download"></i> QR'ı İndir
                 </button>
-                <button class="btn btn-outline-primary" onclick="shareQR()" id="shareBtn" style="display:none;">
-                    <i class="bi bi-share-fill"></i> Paylaş
+                
+                <!-- Mobile: Show share button -->
+                <button class="btn btn-primary mobile-only" onclick="shareQR()" id="shareBtnMobile">
+                    <i class="bi bi-send-fill"></i> Gönder
                 </button>
             </div>
             
@@ -131,36 +248,60 @@
     </div>
 
     <script>
-        // Check if Share API is available (mobile devices)
-        if (navigator.share) {
-            document.getElementById('shareBtn').style.display = 'block';
-        }
-
+        // Desktop: Download QR code
         function downloadQR() {
-            const qrImage = document.getElementById('qrImage');
-            const link = document.createElement('a');
-            link.download = 'qr-kod-@(userId).png';
+            var qrImage = document.getElementById('qrImage');
+            var link = document.createElement('a');
+            link.download = 'etkinlik-qr-kod.png';
             link.href = qrImage.src;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            showButtonFeedback(event.target, 'İndirildi!');
         }
 
+        // Share QR code using Share API
         async function shareQR() {
             try {
-                const qrImage = document.getElementById('qrImage');
-                const response = await fetch(qrImage.src);
-                const blob = await response.blob();
-                const file = new File([blob], 'qr-kod.png', { type: 'image/png' });
+                var qrImage = document.getElementById('qrImage');
+                var response = await fetch(qrImage.src);
+                var blob = await response.blob();
+                var file = new File([blob], 'etkinlik-qr-kod.png', { type: 'image/png' });
                 
-                await navigator.share({
-                    title: 'Etkinlik QR Kodum',
-                    text: 'Etkinliklere katılım QR kodum',
-                    files: [file]
-                });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'Etkinlik QR Kodum',
+                        text: 'Etkinliklere katılım için QR kodum',
+                        files: [file]
+                    });
+                } else {
+                    await navigator.share({
+                        title: 'Etkinlik QR Kodum',
+                        text: 'Etkinliklere katılım için QR kodum'
+                    });
+                }
             } catch (err) {
-                console.log('Share failed:', err);
+                if (err.name !== 'AbortError') {
+                    // If share fails, show alert with instructions
+                    alert('QR kodunu kaydetmek için:\n\n📸 Ekran görüntüsü alın\n(Güç + Ses Aşağı tuşları)');
+                }
             }
+        }
+
+        // Helper function for button feedback
+        function showButtonFeedback(button, message) {
+            var btn = button.closest('button');
+            var originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> ' + message;
+            btn.classList.add('btn-success');
+            btn.classList.remove('btn-primary');
+            
+            setTimeout(function() {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-primary');
+            }, 2000);
         }
     </script>
 </body>
