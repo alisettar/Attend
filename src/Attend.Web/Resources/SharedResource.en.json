@@ -76,6 +76,7 @@
   "NoUsersFound": "No participants found",
   "NoEventsFound": "No events found",
   "ConfirmDelete": "Are you sure you want to delete?",
+  "WillBeDeleted": "will be deleted. Do you confirm?",
   "Details": "Details",
   "QRCode": "QR Code",
   "Logout": "Logout",

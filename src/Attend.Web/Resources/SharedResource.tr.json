@@ -76,6 +76,7 @@
   "NoUsersFound": "Katılımcı bulunamadı",
   "NoEventsFound": "Etkinlik bulunamadı",
   "ConfirmDelete": "Silmek istediğinize emin misiniz?",
+  "WillBeDeleted": "silinecektir. Onaylıyor musunuz?",
   "Details": "Detaylar",
   "QRCode": "QR Kod",
   "Logout": "Çıkış Yap",

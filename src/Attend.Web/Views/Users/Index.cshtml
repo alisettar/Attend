@@ -42,7 +42,7 @@
                         <td class="action-buttons">
                             <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
                             <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteUser('@user.Id', '@user.Name')">@Localizer["Delete"]</button>
+                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-user-id="@user.Id" data-user-name="@user.Name">@Localizer["Delete"]</button>
                         </td>
                     </tr>
                 }
@@ -96,10 +96,27 @@ else
     <p class="text-muted">@Localizer["NoUsersFound"]</p>
 }
 
-<!-- Hidden form for deletion -->
-<form id="deleteForm" method="post" style="display: none;">
-    @Html.AntiForgeryToken()
-</form>
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">@Localizer["ConfirmDelete"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong id="deleteUserName"></strong> @Localizer["WillBeDeleted"]</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@Localizer["Cancel"]</button>
+                <form id="deleteForm" method="post" style="display: inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">@Localizer["Delete"]</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 <style>
     .action-buttons .btn {
@@ -122,11 +139,16 @@ else
 </style>
 
 <script>
-    function deleteUser(userId, userName) {
-        if (confirm('@Localizer["ConfirmDelete"]')) {
-            var form = document.getElementById('deleteForm');
-            form.action = '@Url.Action("Delete")/' + userId;
-            form.submit();
-        }
-    }
+    var deleteModal = document.getElementById('deleteModal');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var userId = button.getAttribute('data-user-id');
+        var userName = button.getAttribute('data-user-name');
+        
+        var form = document.getElementById('deleteForm');
+        form.action = '@Url.Action("Delete")/' + userId;
+        
+        var nameElement = document.getElementById('deleteUserName');
+        nameElement.textContent = userName;
+    });
 </script>
