@@ -22,6 +22,7 @@ public class RegisterController : Controller
     public IActionResult Index(string tenantHash)
     {
         ViewBag.TenantHash = tenantHash;
+        ViewBag.TenantName = GetTenantName(tenantHash);
         ViewBag.RecaptchaSiteKey = _configuration["GoogleReCaptcha:SiteKey"];
         return View();
     }
@@ -33,6 +34,7 @@ public class RegisterController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.TenantHash = tenantHash;
+            ViewBag.TenantName = GetTenantName(tenantHash);
             ViewBag.RecaptchaSiteKey = _configuration["GoogleReCaptcha:SiteKey"];
             return View("Index", model);
         }
@@ -54,6 +56,7 @@ public class RegisterController : Controller
 
             return RedirectToAction("Success", new
             {
+                tenantHash = tenantHash,
                 userId = result.UserId,
                 userName = result.UserName,
                 qrCodeImage = result.QRCodeImage
@@ -73,17 +76,36 @@ public class RegisterController : Controller
         }
 
         ViewBag.TenantHash = tenantHash;
+        ViewBag.TenantName = GetTenantName(tenantHash);
         ViewBag.RecaptchaSiteKey = _configuration["GoogleReCaptcha:SiteKey"];
         return View("Index", model);
     }
 
     [HttpGet("/register/success")]
-    public IActionResult Success(Guid userId, string userName, string qrCodeImage)
+    public IActionResult Success(string tenantHash, Guid userId, string userName, string qrCodeImage)
     {
+        ViewBag.TenantHash = tenantHash;
+        ViewBag.TenantName = GetTenantName(tenantHash);
         ViewBag.QRCodeImage = qrCodeImage;
         ViewBag.UserName = userName;
         ViewBag.UserId = userId;
 
         return View();
+    }
+
+    private string GetTenantName(string tenantHash)
+    {
+        var tenants = _configuration.GetSection("TenantsConfiguration:Tenants").GetChildren();
+        
+        foreach (var tenant in tenants)
+        {
+            var hash = tenant["Hash"];
+            if (hash == tenantHash)
+            {
+                return tenant["Name"] ?? "Bilinmeyen";
+            }
+        }
+
+        return "Bilinmeyen";
     }
 }
