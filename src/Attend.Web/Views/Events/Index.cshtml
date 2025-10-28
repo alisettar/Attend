@@ -20,33 +20,33 @@
 
 @if (Model.Items.Any())
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>@Localizer["Title"]</th>
-                <th>@Localizer["Description"]</th>
-                <th>@Localizer["Date"]</th>
-                <th>@Localizer["Actions"]</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var evt in Model.Items)
-            {
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>@evt.Title</td>
-                    <td>@evt.Description</td>
-                    <td>@evt.Date.ToString("dd MMM yyyy HH:mm")</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@evt.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
-                        <a asp-action="Edit" asp-route-id="@evt.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
-                        <form asp-action="Delete" asp-route-id="@evt.Id" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('@Localizer["ConfirmDelete"]')">@Localizer["Delete"]</button>
-                        </form>
-                    </td>
+                    <th>@Localizer["Title"]</th>
+                    <th>@Localizer["Description"]</th>
+                    <th>@Localizer["Date"]</th>
+                    <th>@Localizer["Actions"]</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var evt in Model.Items)
+                {
+                    <tr>
+                        <td>@evt.Title</td>
+                        <td>@evt.Description</td>
+                        <td>@evt.Date.ToString("dd MMM yyyy HH:mm")</td>
+                        <td class="action-buttons">
+                            <a asp-action="Details" asp-route-id="@evt.Id" class="btn btn-sm btn-info">@Localizer["Details"]</a>
+                            <a asp-action="Edit" asp-route-id="@evt.Id" class="btn btn-sm btn-warning">@Localizer["Edit"]</a>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="deleteEvent('@evt.Id', '@evt.Title')">@Localizer["Delete"]</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 
     <nav>
         <ul class="pagination justify-content-center">
@@ -93,3 +93,38 @@ else
 {
     <p class="text-muted">@Localizer["NoEventsFound"]</p>
 }
+
+<!-- Hidden form for deletion -->
+<form id="deleteForm" method="post" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
+<style>
+    .action-buttons .btn {
+        margin: 2px;
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    @@media (max-width: 768px) {
+        .action-buttons {
+            white-space: nowrap;
+        }
+        .action-buttons .btn {
+            padding: 8px 12px;
+        }
+    }
+</style>
+
+<script>
+    function deleteEvent(eventId, eventTitle) {
+        if (confirm('@Localizer["ConfirmDelete"]')) {
+            var form = document.getElementById('deleteForm');
+            form.action = '@Url.Action("Delete")/' + eventId;
+            form.submit();
+        }
+    }
+</script>
