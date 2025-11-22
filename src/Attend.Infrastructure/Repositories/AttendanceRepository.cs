@@ -2,6 +2,7 @@ using Attend.Application.Data;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
 using Attend.Domain.Enums;
+using Attend.Infrastructure.Extensions;
 using Attend.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,12 +60,40 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            query = query.Where(a =>
-                a.User.Name.Contains(request.SearchText) ||
-                (a.User.Email != null && a.User.Email.Contains(request.SearchText)));
+            // Client-side evaluation: Tüm kayıtları çek, sonra filtrele
+            var allAttendances = await query.ToListAsync(cancellationToken);
+            var normalizedSearch = request.SearchText.NormalizeTurkish();
+            
+            var filteredAttendances = allAttendances.Where(a =>
+                a.User.Name.NormalizeTurkish().Contains(normalizedSearch) ||
+                (a.User.Email != null && a.User.Email.NormalizeTurkish().Contains(normalizedSearch))
+            ).ToList();
+            
+            var totalCount = filteredAttendances.Count;
+            
+            // Sıralama
+            var sortedAttendances = request.OrderBy switch
+            {
+                "UserName" => request.OrderDescending 
+                    ? filteredAttendances.OrderByDescending(a => a.User.Name) 
+                    : filteredAttendances.OrderBy(a => a.User.Name),
+                "CheckedIn" => request.OrderDescending 
+                    ? filteredAttendances.OrderByDescending(a => a.CheckedIn) 
+                    : filteredAttendances.OrderBy(a => a.CheckedIn),
+                _ => filteredAttendances.OrderBy(a => a.User.Name)
+            };
+            
+            // Pagination
+            var paginatedItems = sortedAttendances
+                .Skip(request.Page * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+            
+            return (paginatedItems, totalCount);
         }
 
-        var totalCount = await query.LongCountAsync(cancellationToken);
+        // Arama yapılmadıysa normal pagination
+        var count = await query.LongCountAsync(cancellationToken);
 
         query = request.OrderBy switch
         {
@@ -78,7 +107,7 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        return (items, totalCount);
+        return (items, count);
     }
 
     public async Task<(List<Attendance> items, long totalCount)> GetPaginatedByUserAsync(
@@ -94,12 +123,40 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            query = query.Where(a =>
-                a.Event.Title.Contains(request.SearchText) ||
-                (a.Event.Description != null && a.Event.Description.Contains(request.SearchText)));
+            // Client-side evaluation: Tüm kayıtları çek, sonra filtrele
+            var allAttendances = await query.ToListAsync(cancellationToken);
+            var normalizedSearch = request.SearchText.NormalizeTurkish();
+            
+            var filteredAttendances = allAttendances.Where(a =>
+                a.Event.Title.NormalizeTurkish().Contains(normalizedSearch) ||
+                (a.Event.Description != null && a.Event.Description.NormalizeTurkish().Contains(normalizedSearch))
+            ).ToList();
+            
+            var totalCount = filteredAttendances.Count;
+            
+            // Sıralama
+            var sortedAttendances = request.OrderBy switch
+            {
+                "EventTitle" => request.OrderDescending 
+                    ? filteredAttendances.OrderByDescending(a => a.Event.Title) 
+                    : filteredAttendances.OrderBy(a => a.Event.Title),
+                "EventDate" => request.OrderDescending 
+                    ? filteredAttendances.OrderByDescending(a => a.Event.Date) 
+                    : filteredAttendances.OrderBy(a => a.Event.Date),
+                _ => filteredAttendances.OrderByDescending(a => a.Event.Date)
+            };
+            
+            // Pagination
+            var paginatedItems = sortedAttendances
+                .Skip(request.Page * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+            
+            return (paginatedItems, totalCount);
         }
 
-        var totalCount = await query.LongCountAsync(cancellationToken);
+        // Arama yapılmadıysa normal pagination
+        var count = await query.LongCountAsync(cancellationToken);
 
         query = request.OrderBy switch
         {
@@ -113,7 +170,7 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        return (items, totalCount);
+        return (items, count);
     }
 
     public async Task AddAsync(Attendance attendance, CancellationToken cancellationToken)

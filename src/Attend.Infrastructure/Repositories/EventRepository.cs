@@ -1,6 +1,7 @@
 using Attend.Application.Data;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
+using Attend.Infrastructure.Extensions;
 using Attend.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,13 +36,43 @@ public class EventRepository(AttendDbContext context) : IEventRepository
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            var searchUpper = request.SearchText.ToUpper();
-            query = query.Where(e =>
-                e.Title.ToUpper().Contains(searchUpper) ||
-                (e.Description != null && e.Description.ToUpper().Contains(searchUpper)));
+            // Client-side evaluation: Tüm kayıtları çek, sonra filtrele
+            // Türkçe karakter ve case-insensitive arama için
+            var allEvents = await query.ToListAsync(cancellationToken);
+            var normalizedSearch = request.SearchText.NormalizeTurkish();
+            
+            var filteredEvents = allEvents.Where(e =>
+                e.Title.NormalizeTurkish().Contains(normalizedSearch) ||
+                (e.Description != null && e.Description.NormalizeTurkish().Contains(normalizedSearch))
+            ).ToList();
+            
+            var totalCount = filteredEvents.Count;
+            
+            // Sıralama
+            var sortedEvents = request.OrderBy switch
+            {
+                "Title" => request.OrderDescending 
+                    ? filteredEvents.OrderByDescending(e => e.Title) 
+                    : filteredEvents.OrderBy(e => e.Title),
+                "Date" => request.OrderDescending 
+                    ? filteredEvents.OrderByDescending(e => e.Date) 
+                    : filteredEvents.OrderBy(e => e.Date),
+                _ => request.OrderDescending 
+                    ? filteredEvents.OrderByDescending(e => e.CreatedAt) 
+                    : filteredEvents.OrderBy(e => e.CreatedAt)
+            };
+            
+            // Pagination
+            var paginatedItems = sortedEvents
+                .Skip(request.Page * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+            
+            return (paginatedItems, totalCount);
         }
 
-        var totalCount = await query.LongCountAsync(cancellationToken);
+        // Arama yapılmadıysa normal pagination
+        var count = await query.LongCountAsync(cancellationToken);
 
         query = request.OrderBy switch
         {
@@ -55,7 +86,7 @@ public class EventRepository(AttendDbContext context) : IEventRepository
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        return (items, totalCount);
+        return (items, count);
     }
 
     public async Task AddAsync(Event @event, CancellationToken cancellationToken)

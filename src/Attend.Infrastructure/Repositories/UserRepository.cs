@@ -1,6 +1,7 @@
 using Attend.Application.Data;
 using Attend.Application.Repositories;
 using Attend.Domain.Entities;
+using Attend.Infrastructure.Extensions;
 using Attend.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -53,14 +54,44 @@ public class UserRepository(AttendDbContext context) : IUserRepository
 
         if (!string.IsNullOrEmpty(request.SearchText))
         {
-            var searchUpper = request.SearchText.ToUpper();
-            query = query.Where(u =>
-                u.Name.ToUpper().Contains(searchUpper) ||
-                (u.Email != null && u.Email.ToUpper().Contains(searchUpper)) ||
-                (u.Phone != null && u.Phone.ToUpper().Contains(searchUpper)));
+            // Client-side evaluation: Tüm kayıtları çek, sonra filtrele
+            // Türkçe karakter ve case-insensitive arama için
+            var allUsers = await query.ToListAsync(cancellationToken);
+            var normalizedSearch = request.SearchText.NormalizeTurkish();
+            
+            var filteredUsers = allUsers.Where(u =>
+                u.Name.NormalizeTurkish().Contains(normalizedSearch) ||
+                (u.Email != null && u.Email.NormalizeTurkish().Contains(normalizedSearch)) ||
+                (u.Phone != null && u.Phone.NormalizeTurkish().Contains(normalizedSearch))
+            ).ToList();
+            
+            var totalCount = filteredUsers.Count;
+            
+            // Sıralama
+            var sortedUsers = request.OrderBy switch
+            {
+                "Name" => request.OrderDescending 
+                    ? filteredUsers.OrderByDescending(u => u.Name) 
+                    : filteredUsers.OrderBy(u => u.Name),
+                "Email" => request.OrderDescending 
+                    ? filteredUsers.OrderByDescending(u => u.Email) 
+                    : filteredUsers.OrderBy(u => u.Email),
+                _ => request.OrderDescending 
+                    ? filteredUsers.OrderByDescending(u => u.CreatedAt) 
+                    : filteredUsers.OrderBy(u => u.CreatedAt)
+            };
+            
+            // Pagination
+            var paginatedItems = sortedUsers
+                .Skip(request.Page * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+            
+            return (paginatedItems, totalCount);
         }
 
-        var totalCount = await query.LongCountAsync(cancellationToken);
+        // Arama yapılmadıysa normal pagination
+        var count = await query.LongCountAsync(cancellationToken);
 
         query = request.OrderBy switch
         {
@@ -74,7 +105,7 @@ public class UserRepository(AttendDbContext context) : IUserRepository
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
 
-        return (items, totalCount);
+        return (items, count);
     }
 
     public async Task AddAsync(User user, CancellationToken cancellationToken)
