@@ -42,6 +42,19 @@ public class EventService(IHttpClientFactory httpClientFactory, ILogger<EventSer
         }
     }
 
+    public async Task<EventStatisticsViewModel?> GetEventStatisticsAsync(Guid id)
+    {
+        try
+        {
+            var response = await _httpClient.GetAsync($"/events/{id}/statistics");
+            return await response.ReadAsJsonOrThrowAsync<EventStatisticsViewModel>();
+        }
+        catch (Attend.Web.Exceptions.ApiException ex) when (ex.StatusCode == 404)
+        {
+            return null;
+        }
+    }
+
     public async Task<Guid> CreateEventAsync(EventCreateViewModel model)
     {
         var json = JsonSerializer.Serialize(model, _jsonOptions);

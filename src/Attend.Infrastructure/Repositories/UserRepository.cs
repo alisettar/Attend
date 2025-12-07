@@ -22,6 +22,10 @@ public class UserRepository(AttendDbContext context) : IUserRepository
         => await context.Users
             .FirstOrDefaultAsync(u => u.QRCode == qrCode, cancellationToken);
 
+    public async Task<User?> GetByPhoneAsync(string phone, CancellationToken cancellationToken)
+        => await context.Users
+            .FirstOrDefaultAsync(u => u.Phone == phone, cancellationToken);
+
     public async Task<bool> ExistsByEmailAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default)
     {
         var query = context.Users.Where(u => u.Email == email);

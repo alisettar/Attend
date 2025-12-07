@@ -8,6 +8,7 @@
     var userName = ViewBag.UserName as string;
     var userId = ViewBag.UserId as Guid?;
     var tenantName = ViewBag.TenantName as string;
+    var isExisting = ViewBag.IsExisting as bool? ?? false;
     var branding = BrandingOptions.Value;
 }
 
@@ -202,8 +203,17 @@
                 </div>
             }
             
-            <h2>Kayıt Başarılı!</h2>
-            <p class="text-muted welcome-text">Hoş geldiniz, <strong>@userName</strong></p>
+            <h2>@(isExisting ? "Kaydınız Bulundu!" : "Kayıt Başarılı!")</h2>
+            <p class="text-muted welcome-text">
+                @if (isExisting)
+                {
+                    <text><strong>@userName</strong>, QR kodunuz aşağıdadır.</text>
+                }
+                else
+                {
+                    <text>Hoş geldiniz, <strong>@userName</strong></text>
+                }
+            </p>
             
             <div class="qr-container">
                 <div class="qr-label">QR Kodunuz</div>

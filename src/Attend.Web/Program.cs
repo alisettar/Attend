@@ -48,6 +48,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddSingleton<IPhoneCheckRateLimitService, PhoneCheckRateLimitService>();
 
 var app = builder.Build();
 

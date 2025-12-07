@@ -7,6 +7,7 @@ public interface IUserRepository
 {
     Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
     Task<User?> GetByQRCodeAsync(string qrCode, CancellationToken cancellationToken);
+    Task<User?> GetByPhoneAsync(string phone, CancellationToken cancellationToken);
     Task<bool> ExistsByEmailAsync(string email, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
     Task<bool> ExistsByPhoneAsync(string phone, Guid? excludeUserId = null, CancellationToken cancellationToken = default);
     Task<List<User>> GetAllAsync(CancellationToken cancellationToken);

@@ -120,8 +120,12 @@ public class EventsController(
             if (@event == null)
                 return NotFound();
 
+            // Get event statistics
+            var statistics = await eventService.GetEventStatisticsAsync(id);
+
             ViewBag.Event = @event;
             ViewBag.StatusFilter = status;
+            ViewBag.Statistics = statistics;
 
             var request = new PaginationRequest(page - 1, 10);
             var attendees = await attendanceService.GetEventAttendeesAsync(id, request);

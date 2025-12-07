@@ -1,4 +1,5 @@
 @using Microsoft.Extensions.Localization
+@using Attend.Web.Extensions
 @inject IStringLocalizer<SharedResource> Localizer
 @model UserViewModel
 
@@ -63,7 +64,7 @@
                 
                 <div class="row mb-3">
                     <div class="col-md-3 fw-bold">@Localizer["CreatedAt"]:</div>
-                    <div class="col-md-9">@Model.CreatedAt.ToString("dd MMM yyyy HH:mm")</div>
+                    <div class="col-md-9">@Model.CreatedAt.ToTurkeyTimeString("dd MMM yyyy HH:mm")</div>
                 </div>
             </div>
         </div>
@@ -159,7 +160,7 @@
                                     {
                                         <span class="text-success">
                                             <i class="bi bi-check-circle-fill me-1"></i>
-                                            @attendance.CheckedInAt.Value.ToString("dd MMM yyyy HH:mm")
+                                            @attendance.CheckedInAt.Value.ToTurkeyTimeString("dd MMM yyyy HH:mm")
                                         </span>
                                     }
                                     else

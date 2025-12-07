@@ -185,6 +185,24 @@ public class AttendanceRepository(AttendDbContext context) : IAttendanceReposito
         await context.SaveChangesAsync(cancellationToken);
     }
 
+    public async Task<Application.Data.Events.Queries.EventStatisticsResponse> GetEventStatisticsAsync(
+        Guid eventId,
+        CancellationToken cancellationToken)
+    {
+        var attendances = await context.Attendances
+            .Where(a => a.EventId == eventId)
+            .ToListAsync(cancellationToken);
+
+        var totalRegistered = attendances.Count;
+        var totalCheckedIn = attendances.Count(a => a.Status == AttendanceStatus.CheckedIn);
+        var totalCancelled = attendances.Count(a => a.Status == AttendanceStatus.Cancelled);
+
+        return new Application.Data.Events.Queries.EventStatisticsResponse(
+            totalRegistered,
+            totalCheckedIn,
+            totalCancelled);
+    }
+
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         var attendance = await GetByIdAsync(id, cancellationToken);
