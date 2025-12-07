@@ -258,6 +258,16 @@
                 <button class="btn btn-primary mobile-only" onclick="shareQR()" id="shareBtnMobile">
                     <i class="bi bi-send-fill"></i> Gönder
                 </button>
+                
+                @if (!string.IsNullOrEmpty(ViewBag.WhatsAppGroupUrl as string))
+                {
+                    <a href="@ViewBag.WhatsAppGroupUrl" 
+                       class="btn btn-success" 
+                       target="_blank" 
+                       rel="noopener noreferrer">
+                        <i class="bi bi-whatsapp"></i> WhatsApp Bildirim Grubuna Katıl
+                    </a>
+                }
             </div>
             
             <p class="company-name">@branding.CompanyName</p>

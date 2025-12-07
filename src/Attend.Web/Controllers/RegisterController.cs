@@ -133,6 +133,7 @@ public class RegisterController(
     {
         ViewBag.TenantHash = tenantHash;
         ViewBag.TenantName = GetTenantName(tenantHash);
+        ViewBag.WhatsAppGroupUrl = GetWhatsAppGroupUrl(tenantHash);
         ViewBag.QRCodeImage = qrCodeImage;
         ViewBag.UserName = userName;
         ViewBag.UserId = userId;
@@ -185,5 +186,21 @@ public class RegisterController(
         }
 
         return "Bilinmeyen";
+    }
+
+    private string? GetWhatsAppGroupUrl(string tenantHash)
+    {
+        var tenants = configuration.GetSection("TenantsConfiguration:Tenants").GetChildren();
+        
+        foreach (var tenant in tenants)
+        {
+            var hash = tenant["Hash"];
+            if (hash == tenantHash)
+            {
+                return tenant["WhatsAppGroupUrl"];
+            }
+        }
+
+        return null;
     }
 }
