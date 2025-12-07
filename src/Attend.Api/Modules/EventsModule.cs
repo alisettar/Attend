@@ -13,6 +13,7 @@ public class EventsModule : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/events/{id}", GetEventById);
+        app.MapGet("/events/{id}/statistics", GetEventStatistics);
         app.MapGet("/events", GetEvents);
         app.MapPost("/events", CreateEvent);
         app.MapPut("/events/{id}", UpdateEvent);
@@ -26,6 +27,15 @@ public class EventsModule : ICarterModule
     {
         var @event = await sender.Send(new GetEventByIdQuery(id), context.RequestAborted);
         return @event is not null ? TypedResults.Ok(@event) : TypedResults.NotFound();
+    }
+
+    private static async Task<Ok<EventStatisticsResponse>> GetEventStatistics(
+        Guid id,
+        [FromServices] ISender sender,
+        HttpContext context)
+    {
+        var statistics = await sender.Send(new GetEventStatisticsQuery(id), context.RequestAborted);
+        return TypedResults.Ok(statistics);
     }
 
     private static async Task<Ok<PaginationResponse<EventResponse>>> GetEvents(

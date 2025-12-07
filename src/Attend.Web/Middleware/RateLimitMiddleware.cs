@@ -52,7 +52,7 @@ public class RateLimitMiddleware
 
     private class RateLimitInfo
     {
-        public List<DateTime> Requests { get; } = new();
+        public List<DateTime> Requests { get; } = [];
         public SemaphoreSlim Semaphore { get; } = new(1, 1);
     }
 }

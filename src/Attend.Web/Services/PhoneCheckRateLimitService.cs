@@ -9,14 +9,14 @@ public interface IPhoneCheckRateLimitService
 
 public class PhoneCheckRateLimitService : IPhoneCheckRateLimitService
 {
-    // IP bazlı: 10 istek/saat
+    // IP bazlı: 30 istek/saat (gerçek kullanıcılar için cömert)
     private static readonly ConcurrentDictionary<string, List<DateTime>> _ipRequests = new();
-    private const int MaxIpRequests = 10;
+    private const int MaxIpRequests = 30;
     private static readonly TimeSpan IpWindow = TimeSpan.FromHours(1);
 
-    // Telefon bazlı: 3 istek/saat
+    // Telefon bazlı: 15 istek/saat (birden fazla deneme için)
     private static readonly ConcurrentDictionary<string, List<DateTime>> _phoneRequests = new();
-    private const int MaxPhoneRequests = 3;
+    private const int MaxPhoneRequests = 15;
     private static readonly TimeSpan PhoneWindow = TimeSpan.FromHours(1);
 
     private static readonly SemaphoreSlim _semaphore = new(1, 1);
